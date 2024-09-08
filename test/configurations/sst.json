@@ -1,0 +1,77 @@
+{
+  "dataset_id": "OSTIA-C3S-L4-GLOB-v3.0",
+  "metadata_dir": "sst-metadata",
+  "stac_collection_id": "sst-cdrv3-collection",
+  "stac_collection_description": "collection of EOCIS SST V3",
+  "file_id_attribute": "tracking_id",
+  "dset_id_name": "dataset_id",
+  "variable": "analysed_sst",
+  "defaults": {
+    "item": {
+      "cf:parameter": [
+        {
+          "name": "analysed_sst",
+          "unit": "kelvin"
+        },
+        {
+          "name": "analysed_sst_uncertainty",
+          "unit": "kelvin"
+        },
+        {
+          "name": "sea_ice_fraction",
+          "unit": "1"
+        }
+      ]
+    },
+    "netcdf_asset": {
+      "cf:parameter": [
+        {
+          "name": "analysed_sst",
+          "unit": "kelvin"
+        },
+        {
+          "name": "analysed_sst_uncertainty",
+          "unit": "kelvin"
+        },
+        {
+          "name": "sea_ice_fraction",
+          "unit": "1"
+        }
+      ]
+    },
+    "kerchunk_asset": {
+      "cf:parameter": [
+        {
+          "name": "analysed_sst",
+          "unit": "kelvin"
+        },
+        {
+          "name": "analysed_sst_uncertainty",
+          "unit": "kelvin"
+        },
+        {
+          "name": "sea_ice_fraction",
+          "unit": "1"
+        }
+      ]
+    }
+  },
+  "global_attrs": [
+    "Conventions"
+  ],
+  "global_attr_map": {
+    "spatial_resolution": "resolution"
+  },
+  "templated_properties": {},
+  "netcdf_url": "http://localhost:9002/sst/data/{year}/{month:02}/{day:02}/",
+  "kerchunk_url": "http://localhost:9002/stac-generated/sst-items/{year}/{month:02}/",
+  "thumbnail_url": "http://localhost:9002/stac-generated/sst-items/{year}/{month:02}/",
+  "thumbnail": {
+    "variable": "analysed_sst",
+    "cmap": "turbo",
+    "vmin": 270,
+    "vmax": 310,
+    "x-coordinate": "lon",
+    "y-coordinate": "lat"
+  }
+}

@@ -1,0 +1,11 @@
+{
+  "defaults": {
+    "item": {
+      "project": "UK Earth Observation Climate Information Service (EOCIS)",
+      "institution": "EOCIS UK"
+    }
+  },
+  "thumbnail": {
+    "width": 768
+  }
+}
