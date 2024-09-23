@@ -27,6 +27,7 @@ from urllib.parse import urljoin
 import argparse
 import httpx
 from httpx_auth import OAuth2ClientCredentials
+import glob
 
 API_URL=""
 
@@ -49,13 +50,11 @@ def add_collection(client,path):
 
     return response.is_success
 
-def remove_collection(client,path):
+def remove_collection(client,collection_id):
 
-    with open(path, encoding="utf-8") as f:
-        data = json.load(f)
 
     response = client.delete(
-            urljoin(API_URL, f"collections/"+data["id"])
+            urljoin(API_URL, f"collections/"+collection_id)
         )
 
     print(response.content)
@@ -85,8 +84,9 @@ def get_collection(client,collection_id):
 
     return response.is_success
 
-def add_items(client,item_paths):
+def add_items(client,item_path):
 
+    item_paths = glob.glob(item_path, recursive=True)
     for path in item_paths:
         with open(path, encoding="utf-8") as f:
             data = json.load(f)
@@ -142,7 +142,7 @@ def main():
     parser.add_argument("--remove-collection")
     parser.add_argument("--get-collection")
     parser.add_argument("--get-items")
-    parser.add_argument("--add-items", nargs="+")
+    parser.add_argument("--add-items")
     parser.add_argument("--remove-items", nargs="+")
     parser.add_argument("--list-collections", action="store_true")
 

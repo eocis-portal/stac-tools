@@ -1,8 +1,8 @@
 {
   "dataset_id": "OSTIA-C3S-L4-GLOB-v3.0",
   "metadata_dir": "sst-metadata",
-  "stac_collection_id": "sst-cdrv3-collection",
-  "stac_collection_description": "collection of EOCIS SST V3",
+  "stac_collection_id": "eocis-sst-cdrv3",
+  "stac_collection_description": "EOCIS Sea-Surface Temperatures V3",
   "file_id_attribute": "tracking_id",
   "dset_id_name": "dataset_id",
   "variable": "analysed_sst",

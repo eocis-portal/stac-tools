@@ -25,4 +25,22 @@ class BasicTest(unittest.TestCase):
 
         converter.run()
 
+    def test_basic_sm(self):
+        config_paths = [
+            os.path.join(test_folder, "configurations","eocis-defaults.json"),
+            os.path.join(test_folder, "configurations", "sm.json")
+        ]
+
+        converter = Netcdf2Stac(
+            base_folder="./stac-generated",
+            input_paths=[os.path.join(test_folder,"sm","data","2024","**","*.nc")],
+            collection_filename="sm-collection.geojson",
+            config_paths=config_paths,
+            item_subfolder="sm-items/{year}/{month:02d}/",
+            generate_netcdf_assets=True,
+            generate_kerchunk_assets=True,
+            generate_thumbnail_assets=True)
+
+        converter.run()
+
 

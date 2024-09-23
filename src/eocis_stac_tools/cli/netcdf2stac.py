@@ -40,6 +40,7 @@ def main():
     parser.add_argument("--item-subfolder", help="name of folder for storing items")
     parser.add_argument("--config-paths", nargs="+", help="path to JSON configuration file(s)", required=True)
     parser.add_argument("--include-kerchunk", action="store_true", help="generate a kerchunk file for each item")
+    parser.add_argument("--inline-kerchunk", action="store_true", help="inline kerchunk into each STAC item")
     parser.add_argument("--include-thumbnails", action="store_true", help="generate a thumbnail image for each item")
     parser.add_argument("--overwrite-items", action="store_true", help="overwrite item/kerchunk files if they already exist")
 
@@ -47,6 +48,7 @@ def main():
     converter = Netcdf2Stac(base_folder=args.base_folder, input_paths=args.input_paths,
                             collection_filename=args.collection_filename, item_subfolder=args.item_subfolder,
                             config_paths=args.config_paths, generate_kerchunk_assets=args.include_kerchunk,
+                            inline_kerchunk=args.inline_kerchunk,
                             generate_thumbnail_assets=args.include_thumbnails, overwrite_items=args.overwrite_items)
     converter.run()
 

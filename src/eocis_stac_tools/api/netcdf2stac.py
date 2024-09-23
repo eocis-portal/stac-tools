@@ -28,6 +28,7 @@ import json
 import uuid
 import glob
 import logging
+import base64
 
 import pystac
 import pandas
@@ -95,8 +96,8 @@ class NCFileInspector:
         if metadata_valid:
             return floats([geospatial_lon_min, geospatial_lat_min, geospatial_lon_max, geospatial_lat_max])
         # otherwise, extract from the data
-        lt = self.ds.cf["latitude"]
-        ln = self.ds.cf["longitude"]
+        lt = self.ds["lat"]
+        ln = self.ds["lon"]
         return floats([ln.min(), lt.min(), ln.max(), lt.max()])
 
     def get_level(self):
@@ -160,7 +161,7 @@ def generate_kerchunk(filepath, url, outpath):
 class Netcdf2Stac:
 
     def __init__(self, base_folder, input_paths, config_paths, collection_filename="collection.json", item_subfolder="items",
-                 generate_kerchunk_assets=True, generate_netcdf_assets=True, generate_thumbnail_assets=True,
+                 generate_kerchunk_assets=True, inline_kerchunk=False, generate_netcdf_assets=True, generate_thumbnail_assets=True,
                  overwrite_items=False):
         self.base_folder = base_folder
         self.input_paths = input_paths
@@ -177,6 +178,7 @@ class Netcdf2Stac:
         self.logger = logging.getLogger("Netcdf2Stac")
 
         self.generate_kerchunk_assets = generate_kerchunk_assets
+        self.inline_kerchunk = inline_kerchunk
         self.generate_netcdf_assets = generate_netcdf_assets
         self.generate_thumbnail_assets = generate_thumbnail_assets
         self.overwrite_items = overwrite_items
@@ -337,9 +339,14 @@ class Netcdf2Stac:
 
         if self.generate_kerchunk_assets:
             kerchunk_asset_dict = get_kerchunk_asset_dict(kerchunk_filename, self.config, dt)
-            href = kerchunk_asset_dict["href"]
+
             generate_kerchunk(fpath, netcdf_href, kerchunk_filepath)
+            href = kerchunk_asset_dict["href"]
             del kerchunk_asset_dict["href"]
+            if self.inline_kerchunk:
+                with open(kerchunk_filepath,"rb") as f:
+                    kerchunk_content = f.read()
+                    href = "data:application/json;base64,"+base64.b64encode(kerchunk_content).decode()
             asset_key = os.path.splitext(input_filename)[0]+"-kerchunk"
             kerchunk_asset = pystac.Asset(href=href,
                                  roles=["metadata"],

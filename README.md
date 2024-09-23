@@ -9,12 +9,17 @@ Utilities to convert the metadata in EOCIS netcdf4 data file(s) to a STAC collec
 
 ## Dependencies
 
+Installation into a miniforge enviromnent is suggested.  See [https://github.com/conda-forge/miniforge](https://github.com/conda-forge/miniforge) for installing miniforge.
+
+
+
 Suggested environment:
 
 ```
-conda create -n stac_tools_env python=3.10
-conda activate stac_tools_env
-conda install xarray netcdf4 pystac pystac-client httpx requests kerchunk h5py aiohttp matplotlib zarr datashader pillow
+mamba create -n stac_tools_env python=3.10
+mamba activate stac_tools_env
+mamba install xarray netcdf4 pystac pystac-client httpx requests kerchunk h5py aiohttp matplotlib zarr datashader pillow 
+pip install httpx_auth
 ```
 
 ## Installation
@@ -28,7 +33,7 @@ cd stac-tools
 pip install -e .
 ```
 
-This should install the `netcdf2stac and uploadstac` tools
+This should install the `netcdf2stac` and `uploadstac` tools
 
 ## Creating STAC files
 
