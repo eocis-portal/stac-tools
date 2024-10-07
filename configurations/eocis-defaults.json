@@ -3,6 +3,20 @@
     "item": {
       "project": "UK Earth Observation Climate Information Service (EOCIS)",
       "institution": "EOCIS UK"
+    },
+    "kerchunk_asset": {
+      "cloud_format": "kerchunk",
+      "checksum": null,
+      "checksum_type": null,
+      "size": null,
+      "open_kwargs":{
+          "open_mapper_kwargs": {
+          },
+          "open_zarr_kwargs": {
+          },
+          "open_xarray_kwargs": {
+          }
+      }
     }
   },
   "thumbnail": {

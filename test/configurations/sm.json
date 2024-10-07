@@ -1,0 +1,53 @@
+{
+  "dataset_id": "SOIL-MOISTURE-V2.3.0",
+  "metadata_dir": "sst-metadata",
+  "stac_collection_id": "soil-moisture-collection",
+  "stac_collection_description": "collection of EOCIS SOIL MOISTURE V2.3.0",
+  "file_id_attribute": "tracking_id",
+  "dset_id_name": "dataset_id",
+  "variable": "smc_avail_top",
+  "defaults": {
+    "item": {
+      "cf:parameter": [
+        {
+          "name": "smc_avail_top",
+          "unit": "kg m-2"
+        }
+      ]
+    },
+    "netcdf_asset": {
+      "cf:parameter": [
+        {
+          "name": "smc_avail_top",
+          "unit": "kg m-2"
+        }
+      ]
+    },
+    "kerchunk_asset": {
+      "cf:parameter": [
+        {
+          "name": "smc_avail_top",
+          "unit": "kg m-2"
+        }
+      ]
+    }
+  },
+  "global_attrs": [
+    "Conventions"
+  ],
+  "global_attr_map": {
+    "spatial_resolution": "resolution"
+  },
+  "templated_properties": {},
+  "netcdf_url": "http://localhost:9002/sm/data/{year}/{month:02}/{day:02}/",
+  "kerchunk_url": "http://localhost:9002/stac-generated/sm-items/{year}/{month:02}/",
+  "thumbnail_url": "http://localhost:9002/stac-generated/sm-items/{year}/{month:02}/",
+  "thumbnail": {
+    "variable": "smc_avail_top",
+    "cmap": "Greens",
+    "vmin": 0,
+    "vmax": 200,
+    "x-coordinate": "lon",
+    "y-coordinate": "lat"
+  }
+}

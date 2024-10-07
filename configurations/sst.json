@@ -40,20 +40,7 @@
       ]
     },
     "kerchunk_asset": {
-      "cf:parameter": [
-        {
-          "name": "analysed_sst",
-          "unit": "kelvin"
-        },
-        {
-          "name": "analysed_sst_uncertainty",
-          "unit": "kelvin"
-        },
-        {
-          "name": "sea_ice_fraction",
-          "unit": "1"
-        }
-      ]
+
     }
   },
   "global_attrs": [

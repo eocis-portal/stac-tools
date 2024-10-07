@@ -28,6 +28,7 @@ import argparse
 import httpx
 from httpx_auth import OAuth2ClientCredentials
 import glob
+import time
 
 API_URL=""
 
@@ -112,6 +113,26 @@ def get_items(client,collection_id):
         print(response.content)
         return None
 
+def clear_collection(client,collection_id):
+    while True:
+        time.sleep(10)
+        items = get_items(client,collection_id)
+        if items is None or len(items) == 0:
+            break
+        for item in items:
+
+            response = client.delete(
+                   urljoin(API_URL, f"collections/{collection_id}/items/{item['id']}")
+              )
+
+            if not response.is_success:
+                print(item["id"])
+                print(response.content)
+            else:
+                print("OK")
+
+    return True
+
 def remove_items(client,item_paths):
     for path in item_paths:
         with open(path, encoding="utf-8") as f:
@@ -138,6 +159,7 @@ def main():
     parser.add_argument("--oauth2-clientid", default="")
     parser.add_argument("--oauth2-clientsecret", default="")
     parser.add_argument("--add-collection")
+    parser.add_argument("--clear-collection")
     parser.add_argument("--modify-collection")
     parser.add_argument("--remove-collection")
     parser.add_argument("--get-collection")
@@ -179,6 +201,9 @@ def main():
 
     if args.get_collection:
         get_collection(client,args.get_collection)
+
+    if args.clear_collection:
+        clear_collection(client,args.clear_collection)
 
     if args.get_items:
         print(len(get_items(client,args.get_items)))

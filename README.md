@@ -11,8 +11,6 @@ Utilities to convert the metadata in EOCIS netcdf4 data file(s) to a STAC collec
 
 Installation into a miniforge enviromnent is suggested.  See [https://github.com/conda-forge/miniforge](https://github.com/conda-forge/miniforge) for installing miniforge.
 
-
-
 Suggested environment:
 
 ```

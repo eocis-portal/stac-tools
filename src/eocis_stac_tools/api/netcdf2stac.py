@@ -81,7 +81,7 @@ class NCFileInspector:
         return props
 
     def get_datetime(self, index=0):
-        return pandas.Timestamp(self.ds.time.values[index]).to_pydatetime()
+        return pandas.Timestamp(self.ds.time.values[index]).to_pydatetime().replace(tzinfo=datetime.timezone.utc)
 
     def get_bbox(self):
         # use the geopspatial min/max metdata if present
@@ -205,6 +205,10 @@ class Netcdf2Stac:
             with open(config_path) as f:
                 self.config = merge(self.config, json.loads(f.read()))
 
+        self.climatology_interval = None
+        if "climatology_interval" in self.config:
+            self.climatology_interval = (datetime.datetime.strptime(self.config["climatology_interval"][0],"%Y-%m-%d"),datetime.datetime.strptime(self.config["climatology_interval"][1],"%Y-%m-%d"))
+
         if os.path.exists(self.collection_path):
             with open(self.collection_path) as f:
                 o = json.loads(f.read())
@@ -248,7 +252,7 @@ class Netcdf2Stac:
 
     def finalise_collection(self):
         spatial_extent = pystac.SpatialExtent([self.bbox])
-        temporal_extent = pystac.TemporalExtent([self.start_date, self.end_date])
+        temporal_extent = pystac.TemporalExtent([self.start_date, self.end_date]) if self.climatology_interval is None else pystac.TemporalExtent(list(self.climatology_interval))
         extent = pystac.Extent(spatial_extent, temporal_extent)
         self.collection.extent = extent
         with open(self.collection_path, "w") as f:
@@ -314,17 +318,30 @@ class Netcdf2Stac:
         for prop, tmpl in self.config["templated_properties"].items():
             props[prop] = tmpl.format(**vars())
 
+        if self.climatology_interval is not None:
+            props["day_of_year"] = dt.timetuple()[7]
+
         input_filename = os.path.split(fpath)[-1]
 
         output_filename = os.path.splitext(input_filename)[0] + ".geojson"
+
+        date_arguments = {}
+        if self.climatology_interval is None:
+            date_arguments["datetime"] = dt
+        else:
+            date_arguments["datetime"] = dt
+            date_arguments["start_datetime"] = self.climatology_interval[0]
+            date_arguments["end_datetime"] = self.climatology_interval[1]
+
         item = pystac.Item(id=item_id,
-                           href= output_filename,
+                           href=output_filename,
                            collection=self.collection,
                            bbox = bbox,
                            properties=props,
-                           datetime = i.get_datetime(),
                            geometry=get_geometry(bbox),
-                           stac_extensions=["https://stac-extensions.github.io/cf/v0.2.0/schema.json"])
+                           stac_extensions=["https://stac-extensions.github.io/cf/v0.2.0/schema.json"],
+                           **date_arguments)
+
 
         item.clear_links()
 
@@ -347,10 +364,10 @@ class Netcdf2Stac:
                 with open(kerchunk_filepath,"rb") as f:
                     kerchunk_content = f.read()
                     href = "data:application/json;base64,"+base64.b64encode(kerchunk_content).decode()
-            asset_key = os.path.splitext(input_filename)[0]+"-kerchunk"
+            asset_key = "reference_file"
             kerchunk_asset = pystac.Asset(href=href,
-                                 roles=["metadata"],
-                                 media_type="application/json",
+                                 roles=["reference","data"],
+                                 media_type="application/zstd",
                                  extra_fields=kerchunk_asset_dict)
             item.add_asset(asset_key, kerchunk_asset)
 

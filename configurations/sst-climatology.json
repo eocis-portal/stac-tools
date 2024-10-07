@@ -1,0 +1,106 @@
+{
+  "dataset_id": "Climatology-ESACCI-L4-GLOB_CDR-v3.0",
+  "metadata_dir": "sst-metadata",
+  "stac_collection_id": "eocis-sst-cdrv3-climatology",
+  "stac_collection_description": "ESA SST CCI Climatology v3.0",
+  "file_id_attribute": "tracking_id",
+  "dset_id_name": "dataset_id",
+  "variable": "analysed_sst",
+  "defaults": {
+    "item": {
+      "cf:parameter": [
+        {
+          "name": "analysed_sst",
+          "unit": "kelvin"
+        },
+        {
+          "name": "analysed_sst_min",
+          "unit": "kelvin"
+        },
+        {
+          "name": "analysed_sst_max",
+          "unit": "kelvin"
+        },
+        {
+          "name": "analysed_sst_std",
+          "unit": "kelvin"
+        },
+        {
+          "name": "sea_ice_fraction",
+          "unit": "1"
+        },
+        {
+          "name": "sea_ice_fraction_min",
+          "unit": "1"
+        },
+        {
+          "name": "sea_ice_fraction_max",
+          "unit": "1"
+        },
+        {
+          "name": "sea_ice_fraction_std",
+          "unit": "1"
+        }
+      ]
+    },
+    "netcdf_asset": {
+      "cf:parameter": [
+        {
+          "name": "analysed_sst",
+          "unit": "kelvin"
+        },
+        {
+          "name": "analysed_sst_min",
+          "unit": "kelvin"
+        },
+        {
+          "name": "analysed_sst_max",
+          "unit": "kelvin"
+        },
+        {
+          "name": "analysed_sst_std",
+          "unit": "kelvin"
+        },
+        {
+          "name": "sea_ice_fraction",
+          "unit": "1"
+        },
+        {
+          "name": "sea_ice_fraction_min",
+          "unit": "1"
+        },
+        {
+          "name": "sea_ice_fraction_max",
+          "unit": "1"
+        },
+        {
+          "name": "sea_ice_fraction_std",
+          "unit": "1"
+        }
+      ]
+    },
+    "kerchunk_asset": {
+
+    }
+  },
+  "global_attrs": [
+    "Conventions"
+  ],
+  "global_attr_map": {
+    "spatial_resolution": "resolution"
+  },
+  "templated_properties": {
+  },
+  "netcdf_url": "https://dap.ceda.ac.uk/neodc/eocis/data/global_and_regional/sea_surface_temperature/CDR_v3/Climatology/L4/v3.0.1/",
+  "kerchunk_url": "https://eocis.org/data/sst-cdrv3-climatology/kerchunk/",
+  "thumbnail_url": "https://eocis.org/data/sst-cdrv3-climatology/thumbnails/",
+  "thumbnail": {
+    "variable": "analysed_sst",
+    "cmap": "turbo",
+    "vmin": 270,
+    "vmax": 310,
+    "x-coordinate": "lon",
+    "y-coordinate": "lat"
+  },
+  "climatology_interval": ["1991-01-01","2000-01-06"]
+}
