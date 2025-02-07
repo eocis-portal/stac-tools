@@ -1,0 +1,158 @@
+{
+  "file_id_attribute": "id",
+  "variable": "lst",
+  "license": "cc-by-4.0",
+  "keywords": [
+    "Earth Science",
+    "Land Surface",
+    "Land Temperature",
+    "Land Surface Temperature",
+    "Global",
+    "Sentinel",
+    "ESA",
+    "EOCIS",
+    "Satellite",
+    "Imagery",
+    "Thermal"
+  ],
+  "defaults": {
+    "collection": {
+    },
+    "all": {
+      "cube:dimensions": {
+        "lon": {
+          "type": "spatial",
+          "axis": "x",
+          "extent": [
+            -180,
+            180
+          ],
+          "reference_system": 4326,
+          "unit": "degrees_east"
+        },
+        "lat": {
+          "type": "spatial",
+          "axis": "y",
+          "extent": [
+            -90,
+            90
+          ],
+          "reference_system": 4326,
+          "unit": "degrees_north"
+        },
+        "time": {
+          "type": "temporal",
+          "step": "P1D"
+        }
+      },
+      "cube:variables": {
+        "lst": {
+          "description": "land surface temperature",
+          "dimensions": [
+            "time",
+            "lat",
+            "lon"
+          ],
+          "type": "data",
+          "unit": "kelvin"
+        },
+        "lst_uncertainty": {
+          "description": "land surface temperature total uncertainty",
+          "dimensions": [
+            "time",
+            "lat",
+            "lon"
+          ],
+          "type": "data",
+          "unit": "kelvin"
+        },
+        "ndvi": {
+          "description": "normalized difference vegetation index",
+          "dimensions": [
+            "time",
+            "lat",
+            "lon"
+          ],
+          "type": "data",
+          "unit": "1"
+        },
+        "emis": {
+          "description": "surface emissivity",
+          "dimensions": [
+            "time",
+            "lat",
+            "lon"
+          ],
+          "type": "data",
+          "unit": "1"
+        },
+        "n": {
+          "description": "number of clear-sky pixels",
+          "dimensions": [
+            "time",
+            "lat",
+            "lon"
+          ],
+          "type": "auxiliary"
+        },
+        "ncld": {
+          "description": "number of cloudy pixels",
+          "dimensions": [
+            "time",
+            "lat",
+            "lon"
+          ],
+          "type": "auxiliary"
+        }
+      }
+    },
+    "item": {
+    },
+    "netcdf_asset": {
+    },
+    "kerchunk_asset": {
+    }
+  },
+  "global_attrs": [
+    "Conventions"
+  ],
+  "global_attr_map": {
+    "spatial_resolution": "resolution",
+    "summary": "description"
+  },
+  "templated_properties": {
+    "platform": "${platform}",
+    "instruments:comma_separated_list": "${sensor}"
+  },
+  "thumbnail": {
+    "variable": "lst",
+    "cmap": "turbo",
+    "vmin": 250,
+    "vmax": 330,
+    "x-coordinate": "lon",
+    "y-coordinate": "lat"
+  },
+  "providers": [
+    {
+      "name": "University of Leicester Surface Temperature Group",
+      "roles": [
+        "producer"
+      ],
+      "url": "https://le.ac.uk/physics/research/earth-observation-science/remote-sensing-of-land-surface"
+    },
+    {
+      "name": "Earth Observation Climate Information Service (EOCIS)",
+      "roles": [
+        "producer"
+      ],
+      "url": "https://eocis.org"
+    },
+    {
+      "name": "Centre for Environmental Data Analysis (CEDA)",
+      "roles": [
+        "host"
+      ],
+      "url": "https://ceda.ac.uk"
+    }
+  ]
+}

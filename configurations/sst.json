@@ -2,45 +2,85 @@
   "dataset_id": "OSTIA-C3S-L4-GLOB-v3.0",
   "metadata_dir": "sst-metadata",
   "stac_collection_id": "eocis-sst-cdrv3",
-  "stac_collection_description": "EOCIS Sea-Surface Temperatures V3",
+  "title": "EOCIS Sea-Surface Temperatures V3",
+  "description": "This dataset provides daily estimates of global sea surface temperature (SST) based on observations from multiple satellite sensors. Resolution: 5km.  Available from 1980 onwards.",
   "file_id_attribute": "tracking_id",
-  "dset_id_name": "dataset_id",
   "variable": "analysed_sst",
+  "license": "cc-by-4.0",
+  "keywords": ["Oceans", "Ocean Temperature", "Sea Surface Temperature"],
   "defaults": {
-    "item": {
-      "cf:parameter": [
+    "all": {
+      "sci:doi": "https://doi.org/10.1038/s41597-024-03147-w",
+      "sci:citation": "Users of these data should cite the dataset along with the dataset paper: Embury, O. et al. Satellite-based time-series of sea-surface temperature since 1980 for climate applications. Scientific Data (2024). https://doi.org/10.1038/s41597-024-03147-w",
+      "sci:publications": [
         {
-          "name": "analysed_sst",
-          "unit": "kelvin"
-        },
-        {
-          "name": "analysed_sst_uncertainty",
-          "unit": "kelvin"
-        },
-        {
-          "name": "sea_ice_fraction",
-          "unit": "1"
+          "doi": "https://doi.org/10.1038/s41597-024-03147-w",
+          "citation": "Embury, O. et al. Satellite-based time-series of sea-surface temperature since 1980 for climate applications. Scientific Data (2024)"
         }
-      ]
+      ],
+      "cube:dimensions": {
+        "lon": {
+          "type": "spatial",
+          "axis": "x",
+          "extent": [
+            -180,
+            180
+          ],
+          "reference_system": 4326,
+          "unit": "degrees_east"
+        },
+        "lat": {
+          "type": "spatial",
+          "axis": "y",
+          "extent": [
+            -90,
+            90
+          ],
+          "reference_system": 4326,
+          "unit": "degrees_north"
+        },
+        "time": {
+          "type": "temporal",
+          "step": "P1D"
+        }
+      },
+      "cube:variables": {
+        "analysed_sst": {
+          "description": "analysed sea surface temperature",
+          "dimensions": [
+            "time",
+            "lat",
+            "lon"
+          ],
+          "type": "data",
+          "unit": "kelvin"
+        },
+        "analysed_sst_uncertainty": {
+          "description": "estimated error standard deviation of analysed_sst",
+          "dimensions": [
+            "time",
+            "lat",
+            "lon"
+          ],
+          "type": "data",
+          "unit": "kelvin"
+        },
+        "sea_ice_fraction": {
+          "description": "sea ice area fraction",
+          "dimensions": [
+            "time",
+            "lat",
+            "lon"
+          ],
+          "type": "data"
+        }
+      }
+    },
+    "item": {
     },
     "netcdf_asset": {
-      "cf:parameter": [
-        {
-          "name": "analysed_sst",
-          "unit": "kelvin"
-        },
-        {
-          "name": "analysed_sst_uncertainty",
-          "unit": "kelvin"
-        },
-        {
-          "name": "sea_ice_fraction",
-          "unit": "1"
-        }
-      ]
     },
     "kerchunk_asset": {
-
     }
   },
   "global_attrs": [
@@ -49,7 +89,10 @@
   "global_attr_map": {
     "spatial_resolution": "resolution"
   },
-  "templated_properties": {},
+  "templated_properties": {
+     "platform": "${platform}",
+     "instruments:comma_separated_list": "${sensor}"
+  },
   "netcdf_url": "https://dap.ceda.ac.uk/neodc/eocis/data/global_and_regional/sea_surface_temperature/CDR_v3/Analysis/L4/v3.0.1/{year}/{month:02}/{day:02}/",
   "kerchunk_url": "https://eocis.org/data/sst-cdrv3-kerchunk/{year}/{month:02}/",
   "thumbnail_url": "https://eocis.org/data/sst-cdrv3-kerchunk/{year}/{month:02}/",

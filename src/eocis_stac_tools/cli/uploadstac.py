@@ -53,7 +53,6 @@ def add_collection(client,path):
 
 def remove_collection(client,collection_id):
 
-
     response = client.delete(
             urljoin(API_URL, f"collections/"+collection_id)
         )
@@ -68,7 +67,8 @@ def modify_collection(client,path):
         data = json.load(f)
 
     response = client.put(
-            urljoin(API_URL, f"collections/"+data["id"])
+            urljoin(API_URL, f"collections/"+data["id"]),
+            json=data
         )
 
     print(response.content)
@@ -99,7 +99,22 @@ def add_items(client,item_path):
 
         print(response.content)
         if not response.is_success:
-            return False
+            print("Failed to add item...")
+
+    return True
+
+def modify_items(client,item_path):
+
+    item_paths = glob.glob(item_path, recursive=True)
+    for path in item_paths:
+        with open(path, encoding="utf-8") as f:
+            data = json.load(f)
+
+            response = client.put(
+                urljoin(API_URL, f"collections/{data['collection']}/items/{data['id']}"),
+                    json=data)
+
+            print(response.content)
 
     return True
 
@@ -115,7 +130,7 @@ def get_items(client,collection_id):
 
 def clear_collection(client,collection_id):
     while True:
-        time.sleep(10)
+        time.sleep(1)
         items = get_items(client,collection_id)
         if items is None or len(items) == 0:
             break
@@ -164,6 +179,7 @@ def main():
     parser.add_argument("--remove-collection")
     parser.add_argument("--get-collection")
     parser.add_argument("--get-items")
+    parser.add_argument("--modify-items")
     parser.add_argument("--add-items")
     parser.add_argument("--remove-items", nargs="+")
     parser.add_argument("--list-collections", action="store_true")
@@ -193,20 +209,26 @@ def main():
         timeout=180,
     )
 
+    if args.clear_collection:
+        clear_collection(client, args.clear_collection)
+
     if args.remove_collection:
-        remove_collection(client,args.remove_collection)
+        remove_collection(client, args.remove_collection)
 
     if args.add_collection:
         add_collection(client,args.add_collection)
 
+    if args.modify_collection:
+        modify_collection(client,args.modify_collection)
+
     if args.get_collection:
         get_collection(client,args.get_collection)
 
-    if args.clear_collection:
-        clear_collection(client,args.clear_collection)
-
     if args.get_items:
         print(len(get_items(client,args.get_items)))
+
+    if args.modify_items:
+        modify_items(client, args.modify_items)
 
     if args.remove_items:
         add_items(client,args.remove_items)

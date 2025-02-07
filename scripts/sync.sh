@@ -15,4 +15,5 @@ else
   rsync -avr $rootfolder/configurations $username@$hostname:$destfolder/stac-tools
   rsync -avr $rootfolder/pyproject.toml $username@$hostname:$destfolder/stac-tools
   rsync -avr $rootfolder/setup.cfg $username@$hostname:$destfolder/stac-tools
+  rsync -avr $rootfolder/scripts $username@$hostname:$destfolder/stac-tools
 fi

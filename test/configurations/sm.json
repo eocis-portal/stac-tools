@@ -6,6 +6,7 @@
   "file_id_attribute": "tracking_id",
   "dset_id_name": "dataset_id",
   "variable": "smc_avail_top",
+  "license": "cc-by-4.0",
   "defaults": {
     "item": {
       "cf:parameter": [

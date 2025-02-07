@@ -1,0 +1,12 @@
+{
+  "stac_collection_id": "eocis-lst-s3a-day",
+  "title": "EOCIS Land Surface Temperature from Sentinel 3A daily (day)",
+  "defaults": {
+    "collection": {
+      "description": "This collection contains datasets of level L3C global land surface temperature from the SLSTR sensor on board Sentinel 3A observed daily during daytime.   The collection is available from 2016-05-01."
+    }
+  },
+  "netcdf_url": "https://dap.ceda.ac.uk/neodc/eocis/data/global_and_regional/land_surface_temperature/SENTINEL3A_SLSTR/L3C/0.01/v4.00/daily/{year}/{month:02}/{day:02}/",
+  "kerchunk_url": "https://eocis.org/data/eocis-lst-s3a-day-kerchunk/{year}/{month:02}/",
+  "thumbnail_url": "https://eocis.org/data/eocis-lst-s3a-day-kerchunk/{year}/{month:02}/"
+}

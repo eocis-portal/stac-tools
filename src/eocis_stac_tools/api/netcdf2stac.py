@@ -21,7 +21,6 @@
 # SOFTWARE.
 
 import datetime
-import sys
 import os
 import hashlib
 import json
@@ -29,9 +28,11 @@ import uuid
 import glob
 import logging
 import base64
-
+import copy
 import pystac
 import pandas
+
+from mako.template import Template
 
 import xarray as xr
 from kerchunk.hdf import SingleHdf5ToZarr
@@ -47,41 +48,26 @@ def expand_dt_template(s, dt):
 def floats(seq):
     return [float(x) for x in seq]
 
-class NCFileInspector:
+def fmt_date(dt):
+    return dt.strftime("%Y-%m-%dT%H:%M:%S%Z").replace("UTC","Z")
 
-    def __init__(self, fpath, var_id, config):
-        self.config = config
+class DatasetWrapper:
+
+    def __init__(self, fpath, var_id):
+        self.fpath = fpath
         self.ds = xr.open_dataset(fpath)
         self.var_id = var_id
         self.var = self.ds[var_id]
 
-    def global_attr(self, key):
-        return self.ds.attrs.get(key, None)
-
-    def get_var_props(self):
-        attrs = self.var.attrs
-        vprops = {
-            "variable_id": self.var_id,
-            "variable_long_name": attrs.get("long_name", None),
-            "variable_units": attrs.get("units", None),
-            "cf_standard_name": attrs.get("standard_name", None)
-        }
-        return vprops
-
-    def get_properties(self):
-        props = {}
-        for key in self.config["global_attrs"]:
-            value = self.global_attr(key)
-            key = self.config["global_attr_map"].get(key, key)
-
-            if isinstance(value, str) and value.lower() in ("null", "none"):
-                value = None
-
-            props[key] = value
-        return props
-
     def get_datetime(self, index=0):
-        return pandas.Timestamp(self.ds.time.values[index]).to_pydatetime().replace(tzinfo=datetime.timezone.utc)
+        try:
+            return pandas.Timestamp(self.ds.time.values[index]).to_pydatetime().replace(tzinfo=datetime.timezone.utc)
+        except:
+            filename = os.path.split(self.fpath)[-1]
+            try:
+                return datetime.datetime.strptime(filename[0:8],"%Y%m%d").replace(tzinfo=datetime.timezone.utc)
+            except:
+                return datetime.datetime.strptime(filename[0:6],"%Y%m").replace(tzinfo=datetime.timezone.utc, day=15)
 
     def get_bbox(self):
         # use the geopspatial min/max metdata if present
@@ -100,23 +86,8 @@ class NCFileInspector:
         ln = self.ds["lon"]
         return floats([ln.min(), lt.min(), ln.max(), lt.max()])
 
-    def get_level(self):
-        try:
-            levels = self.ds.cf["Z"].values
-            return floats([levels[0], levels[-1]])
-        except Exception as exc:
-            return None
-
     def get_dataset(self):
         return self.ds
-
-
-
-def sha256(fpath):
-    # fake hack to not fail if file doesn't exist
-    content = open(fpath, "rb").read() if os.path.isfile(fpath) else fpath.encode("utf-8")
-    return hashlib.sha256(content).hexdigest()
-
 
 def get_geometry(bbox):
     lon_min = bbox[0]
@@ -130,16 +101,22 @@ def get_geometry(bbox):
         ]
     }
 
-def get_netcdf_asset_dict(fpath, config, dt):
+def get_netcdf_asset_dict(fpath, config, dt, dataset_attrs):
+    template = Template(config['netcdf_url'])
+    href = template.render(**dataset_attrs)
+    href = f"{expand_dt_template(href, dt)}{fpath}"
     d = {
-        "href": f"{expand_dt_template(config['netcdf_url'], dt)}{fpath}",
+        "href": href
     }
     d.update(config["defaults"]["netcdf_asset"])
     return d
 
-def get_kerchunk_asset_dict(fpath, config, dt):
+def get_kerchunk_asset_dict(fpath, config, dt, dataset_attrs):
+    template = Template(config['kerchunk_url'])
+    href = template.render(**dataset_attrs)
+    href = f"{expand_dt_template(href, dt)}{fpath}"
     d = {
-        "href": f"{expand_dt_template(config['kerchunk_url'], dt)}{fpath}",
+        "href": href,
     }
     d.update(config["defaults"]["kerchunk_asset"])
     return d
@@ -158,12 +135,15 @@ def generate_kerchunk(filepath, url, outpath):
         with open(outpath, "wb") as of:
             of.write(json.dumps(h5chunks.translate(), indent=4).encode())
 
+
 class Netcdf2Stac:
 
-    def __init__(self, base_folder, input_paths, config_paths, collection_filename="collection.json", item_subfolder="items",
-                 generate_kerchunk_assets=True, inline_kerchunk=False, generate_netcdf_assets=True, generate_thumbnail_assets=True,
+    def __init__(self, base_folder, auxilary_base_folder, input_paths, config_paths, collection_filename="collection.json", item_subfolder="items",
+                 generate_kerchunk_assets=True, inline_kerchunk=False, generate_netcdf_assets=True,
+                 generate_collection_thumbnail_asset=False,
                  overwrite_items=False):
         self.base_folder = base_folder
+        self.auxilary_base_folder = auxilary_base_folder
         self.input_paths = input_paths
         self.collection_filename = collection_filename
         self.collection_path = os.path.join(self.base_folder,self.collection_filename)
@@ -180,7 +160,8 @@ class Netcdf2Stac:
         self.generate_kerchunk_assets = generate_kerchunk_assets
         self.inline_kerchunk = inline_kerchunk
         self.generate_netcdf_assets = generate_netcdf_assets
-        self.generate_thumbnail_assets = generate_thumbnail_assets
+
+        self.generate_collection_thumbnail_asset = generate_collection_thumbnail_asset
         self.overwrite_items = overwrite_items
 
         def merge(d1, d2):
@@ -205,6 +186,9 @@ class Netcdf2Stac:
             with open(config_path) as f:
                 self.config = merge(self.config, json.loads(f.read()))
 
+        if "license" not in self.config:
+            raise Exception("The configuration must include a top level key 'license'")
+
         self.climatology_interval = None
         if "climatology_interval" in self.config:
             self.climatology_interval = (datetime.datetime.strptime(self.config["climatology_interval"][0],"%Y-%m-%d"),datetime.datetime.strptime(self.config["climatology_interval"][1],"%Y-%m-%d"))
@@ -218,16 +202,36 @@ class Netcdf2Stac:
                 self.bbox = self.collection.extent.spatial.bboxes[0]
                 self.logger.info(f"Loaded existing collection {self.start_date} - {self.end_date}")
         else:
+            extra_fields = {}
+            for (key,value) in self.config.get("defaults",{}).get("all",{}).items():
+                extra_fields[key] = copy.deepcopy(value)
+            for (key,value) in self.config.get("defaults",{}).get("collection",{}).items():
+                extra_fields[key] = copy.deepcopy(value)
+            providers = []
+            for p in self.config.get("providers",[]):
+                providers.append(pystac.Provider(**p))
             self.collection = pystac.Collection(id=self.config.get("stac_collection_id", str(uuid.uuid4())),
                                                 href=self.collection_filename,
                                                 extent=None,
-                                                description=self.config.get("stac_collection_description", ""),
-                                                stac_extensions=[
-                                                    "https://stac-extensions.github.io/cf/v0.2.0/schema.json"],
-                                                catalog_type=pystac.CatalogType.SELF_CONTAINED)
+                                                extra_fields=extra_fields,
+                                                license=self.config["license"],
+                                                keywords=self.config.get("keywords",None),
+                                                title=self.config.get("title", ""),
+                                                description=self.config.get("description", ""),
+                                                stac_extensions=self.config.get("stac-extensions",[]),
+                                                catalog_type=pystac.CatalogType.SELF_CONTAINED,
+                                                providers=providers)
 
-        if generate_thumbnail_assets and "thumbnail" in self.config:
+        if "thumbnail" in self.config:
             tcfg = self.config["thumbnail"]
+            background_image_path = None
+            if "background_image_path" in tcfg:
+                # resolve the background image path relative to the configuration files
+                for config_path in self.config_paths:
+                    background_image_path = os.path.join(os.path.split(config_path)[0],
+                                                         tcfg["background_image_path"])
+                    if os.path.exists(background_image_path):
+                        break
             self.thumbnail_generator = Thumbnail(
                 variable=tcfg["variable"],
                 cmap=tcfg["cmap"],
@@ -235,38 +239,56 @@ class Netcdf2Stac:
                 vmax=tcfg["vmax"],
                 x_coord=tcfg["x-coordinate"],
                 y_coord=tcfg["y-coordinate"],
-                plot_width=tcfg["width"]
+                plot_width=tcfg["width"],
+                background_image_path=background_image_path
             )
         else:
             self.thumbnail_generator = None
 
     def run(self):
         os.makedirs(self.base_folder, exist_ok=True)
+        os.makedirs(self.auxilary_base_folder, exist_ok=True)
 
+        all_paths = []
         for input_pattern in self.input_paths:
-            for fpath in glob.glob(input_pattern,recursive=True):
-                self.process_item(fpath)
+            all_paths += glob.glob(input_pattern,recursive=True)
+
+        thumbnail_asset = None
+        for idx in range(len(all_paths)):
+            if idx == len(all_paths)-1 and self.generate_collection_thumbnail_asset:
+                thumbnail_asset = self.process_item(all_paths[idx], return_thumbnail_asset=True)
+            else:
+                self.process_item(all_paths[idx])
 
         if self.collection_path:
-            self.finalise_collection()
+            self.finalise_collection(thumbnail_asset)
 
-    def finalise_collection(self):
+    def finalise_collection(self, thumbnail_asset=None):
+        if thumbnail_asset is not None:
+            self.collection.add_asset("thumbnail",thumbnail_asset)
         spatial_extent = pystac.SpatialExtent([self.bbox])
         temporal_extent = pystac.TemporalExtent([self.start_date, self.end_date]) if self.climatology_interval is None else pystac.TemporalExtent(list(self.climatology_interval))
         extent = pystac.Extent(spatial_extent, temporal_extent)
         self.collection.extent = extent
+        extra_time = self.collection.extra_fields.get("cube:dimensions",{}).get("time",None)
+        if extra_time:
+            extra_time["extent"] = [fmt_date(self.start_date), fmt_date(self.end_date)]
         with open(self.collection_path, "w") as f:
             f.write(json.dumps(self.collection.to_dict(include_self_link=False), indent=4))
 
-    def process_item(self, fpath):
+    def process_item(self, fpath, return_thumbnail_asset=False):
         input_filename = os.path.split(fpath)[-1]
 
         self.logger.info(f"Processing item {fpath}")
 
         var_id = self.config["variable"]
-        dset_id = self.config["dataset_id"]
 
-        i = NCFileInspector(fpath, var_id, self.config)
+        try:
+            i = DatasetWrapper(fpath, var_id)
+        except Exception as ex:
+            self.logger.exception(f"Reading {fpath}")
+            return False
+
         bbox = i.get_bbox()
 
         if self.bbox is None:
@@ -289,9 +311,10 @@ class Netcdf2Stac:
 
         item_subfolder = expand_dt_template(self.item_subfolder,dt)
         os.makedirs(os.path.join(self.base_folder, item_subfolder), exist_ok=True)
+        os.makedirs(os.path.join(self.auxilary_base_folder, item_subfolder), exist_ok=True)
         item_subfolder_levels = len(item_subfolder.split("/"))
         kerchunk_filename = os.path.splitext(input_filename)[0] + "-kerchunk.json"
-        kerchunk_filepath = os.path.join(self.base_folder, item_subfolder, kerchunk_filename)
+        kerchunk_filepath = os.path.join(self.auxilary_base_folder, item_subfolder, kerchunk_filename)
         output_filename = os.path.splitext(input_filename)[0] + ".geojson"
         output_filepath = os.path.join(self.base_folder, item_subfolder, output_filename)
         if not self.overwrite_items:
@@ -307,16 +330,48 @@ class Netcdf2Stac:
 
         item_id = str(uuid.uuid4())
 
-        props = self.config.get("defaults", {}).get("item", {})
+        props = {}
+        for (key, value) in self.config.get("defaults", {}).get("all", {}).items():
+            props[key] = copy.deepcopy(value)
+        for (key, value) in self.config.get("defaults", {}).get("item", {}).items():
+            props[key] = copy.deepcopy(value)
 
-        props.update(i.get_properties())
+        extra_time = props.get("cube:dimensions", {}).get("time", None)
+        if extra_time:
+            extra_time["values"] = [fmt_date(dt)]
 
-        # Add dataset ID
-        props[self.config["dset_id_name"]] = dset_id
+        props["license"] = self.config["license"]
+
+        for (source_key, dest_key) in self.config.get("global_attr_map",{}).items():
+            if source_key in i.get_dataset().attrs:
+                props[dest_key] = i.get_dataset().attrs[source_key]
+
+        # Add dataset ID, title, description
+        dset_id = self.config.get("dataset_id", "")
+        if dset_id:
+            props["dataset_id"] = dset_id
+
+        title = self.config.get("title", "")
+        if title:
+            props["title"] = title
+
+        description = self.config.get("description", "")
+        if description:
+            props["description"] = description
 
         # Add templated properties
         for prop, tmpl in self.config["templated_properties"].items():
-            props[prop] = tmpl.format(**vars())
+            try:
+                prop_comps = prop.split(":")
+                prop = prop_comps[0]
+                directive = prop_comps[1] if len(prop_comps) > 1 else None
+                template = Template(tmpl)
+                v = template.render(**i.get_dataset().attrs)
+                if directive == "comma_separated_list":
+                    v = list(map(lambda s: s.strip(),v.split(",")))
+                props[prop] = v
+            except Exception as ex:
+                print(f"warning, unable to resolve template {prop} {tmpl}: {ex}")
 
         if self.climatology_interval is not None:
             props["day_of_year"] = dt.timetuple()[7]
@@ -339,7 +394,7 @@ class Netcdf2Stac:
                            bbox = bbox,
                            properties=props,
                            geometry=get_geometry(bbox),
-                           stac_extensions=["https://stac-extensions.github.io/cf/v0.2.0/schema.json"],
+                           stac_extensions=self.config.get("stac-extensions",[]),
                            **date_arguments)
 
 
@@ -351,11 +406,11 @@ class Netcdf2Stac:
             item.add_link(clink)
 
         netcdf_filename = os.path.split(fpath)[-1]
-        asset_dict = get_netcdf_asset_dict(netcdf_filename, self.config, dt)
+        asset_dict = get_netcdf_asset_dict(netcdf_filename, self.config, dt, i.get_dataset().attrs)
         netcdf_href = asset_dict["href"]
 
         if self.generate_kerchunk_assets:
-            kerchunk_asset_dict = get_kerchunk_asset_dict(kerchunk_filename, self.config, dt)
+            kerchunk_asset_dict = get_kerchunk_asset_dict(kerchunk_filename, self.config, dt, i.get_dataset().attrs)
 
             generate_kerchunk(fpath, netcdf_href, kerchunk_filepath)
             href = kerchunk_asset_dict["href"]
@@ -380,22 +435,26 @@ class Netcdf2Stac:
                                  extra_fields=asset_dict)
             item.add_asset(asset_key,asset)
 
-        if self.thumbnail_generator:
+        thumbnail_asset = None
+
+        if return_thumbnail_asset and self.thumbnail_generator is not None:
             thumbnail_filename = os.path.splitext(input_filename)[0] + ".png"
-            thumbnail_filepath = os.path.join(self.base_folder, item_subfolder, thumbnail_filename)
+            thumbnail_filepath = os.path.join(self.auxilary_base_folder, item_subfolder, thumbnail_filename)
             asset_dict = get_thumbnail_asset_dict(thumbnail_filename, self.config, dt)
             href = asset_dict["href"]
             del asset_dict["href"]
             self.thumbnail_generator.generate(i.get_dataset(), thumbnail_filepath)
-            asset = pystac.Asset(href=href,
+            thumbnail_asset = pystac.Asset(href=href,
                                  roles=["thumbnail"],
                                  media_type="image/png",
                                  extra_fields=asset_dict)
-            item.add_asset("thumbnail", asset)
 
         with open(output_filepath,"w") as f:
             o = item.to_dict(include_self_link=False)
             f.write(json.dumps(o,indent=4))
+
+        if return_thumbnail_asset:
+            return thumbnail_asset
 
 
 

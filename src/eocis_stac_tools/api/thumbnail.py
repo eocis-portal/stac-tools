@@ -27,12 +27,15 @@ import datashader as dsh
 import datashader.transfer_functions as tf
 from datashader import reductions as rd
 
+from PIL import Image
+
 
 class Thumbnail:
 
-    def __init__(self, variable, cmap, vmin, vmax, x_coord, y_coord, plot_width):
+    def __init__(self, variable, cmap, vmin, vmax, x_coord, y_coord, plot_width, background_image_path=None, background_alpha=0.2):
         self.variable = variable
-
+        self.background_image_path = background_image_path
+        self.background_alpha = background_alpha
         self.vmin = vmin
         self.vmax = vmax
         self.x_coord = x_coord
@@ -75,6 +78,12 @@ class Thumbnail:
                           span=(self.vmin, self.vmax))
 
         p = shaded.to_pil()
+
+        if self.background_image_path:
+            back = Image.open(self.background_image_path)
+            back = back.resize(p.size)
+            p = Image.blend(p, back, self.background_alpha)
+
         with open(output_path, "wb") as f:
             p.save(f, format="PNG")
 

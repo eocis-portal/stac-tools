@@ -27,6 +27,7 @@ Generate STAC item records from EOCIS datasets
 Based on: https://github.com/EO-DataHub/eodh-eocis-sprint
 """
 import logging
+import sys
 
 from ..api.netcdf2stac import Netcdf2Stac
 
@@ -34,24 +35,32 @@ def main():
     logging.basicConfig(level=logging.INFO)
     import argparse
     parser = argparse.ArgumentParser()
-    parser.add_argument("--base-folder", help="folder to write STAC items to")
-    parser.add_argument("--input-paths", nargs="+", help="path(s) to netcdf4 file(s)")
+    parser.add_argument("--base-folder", help="folder to write STAC items to", required=True)
+    parser.add_argument("--auxilary-folder", help="folder to write auxilary items to", required=True)
+    parser.add_argument("--input-paths", nargs="+", help="path(s) to netcdf4 file(s)", required=True)
     parser.add_argument("--collection-filename", help="name of collection", default="collection.json")
     parser.add_argument("--item-subfolder", help="name of folder for storing items", default="items")
     parser.add_argument("--config-paths", nargs="+", help="path to JSON configuration file(s)", required=True)
     parser.add_argument("--include-kerchunk", action="store_true", help="generate a kerchunk file for each item")
     parser.add_argument("--inline-kerchunk", action="store_true", help="inline kerchunk into each STAC item")
-    parser.add_argument("--include-thumbnails", action="store_true", help="generate a thumbnail image for each item")
+    parser.add_argument("--include-collection-thumbnail", action="store_true",
+                        help="generate a thumbnail image for the collection based on the last processed item")
     parser.add_argument("--overwrite-items", action="store_true", help="overwrite item/kerchunk files if they already exist")
 
-    args = parser.parse_args()
-    converter = Netcdf2Stac(base_folder=args.base_folder, input_paths=args.input_paths,
-                            collection_filename=args.collection_filename, item_subfolder=args.item_subfolder,
-                            config_paths=args.config_paths, generate_kerchunk_assets=args.include_kerchunk,
-                            inline_kerchunk=args.inline_kerchunk,
-                            generate_thumbnail_assets=args.include_thumbnails, overwrite_items=args.overwrite_items)
-    converter.run()
 
+    args = parser.parse_args()
+    try:
+        converter = Netcdf2Stac(base_folder=args.base_folder, auxilary_base_folder=args.auxilary_folder,
+                                input_paths=args.input_paths,
+                                collection_filename=args.collection_filename, item_subfolder=args.item_subfolder,
+                                config_paths=args.config_paths, generate_kerchunk_assets=args.include_kerchunk,
+                                inline_kerchunk=args.inline_kerchunk,
+                                generate_collection_thumbnail_asset=args.include_collection_thumbnail,
+                                overwrite_items=args.overwrite_items)
+        converter.run()
+    except Exception as ex:
+        print(f"Error - {ex}")
+        raise
 
 if __name__ == "__main__":
     main()

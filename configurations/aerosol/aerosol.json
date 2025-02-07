@@ -1,0 +1,106 @@
+{
+  "file_id_attribute": "id",
+  "variable": "AOD550_mean",
+  "license": "cc-by-4.0",
+  "keywords": [
+    "Global",
+    "Sentinel",
+    "ESA",
+    "EOCIS",
+    "Satellite",
+    "Observation",
+    "Atmosphere"
+  ],
+  "global_attrs": [
+    "Conventions"
+  ],
+  "templated_properties": {
+    "platform": "${platform}",
+    "instruments:comma_separated_list": "${sensor}"
+  },
+  "defaults": {
+    "collection": {
+    },
+    "all": {
+      "sci:citation": "Users of these data should cite the dataset along with the dataset paper: Pearson, K. et al. Atmospheric aerosol measurements from the ATSR-SLSTR series of dual-view satellite instruments 1995-2022. Scientific Data (2025).",
+      "sci:publications": [
+        {
+          "doi": "",
+          "citation": "Pearson, K., North, P., Heckel, A., Hornero, A., Kinne, S., Popp, T., Sogacheva, L., Griesfeller, J., Atmospheric aerosol measurements from the ATSR-SLSTR series of dual-view satellite instruments 1995-2022, Scientific Data (2025)"
+        }
+      ],
+      "cube:dimensions": {
+        "longitude": {
+          "type": "spatial",
+          "axis": "x",
+          "extent": [
+            -180,
+            180
+          ],
+          "reference_system": 4326,
+          "unit": "degrees_east"
+        },
+        "latitude": {
+          "type": "spatial",
+          "axis": "y",
+          "extent": [
+            -90,
+            90
+          ],
+          "reference_system": 4326,
+          "unit": "degrees_north"
+        }
+      }
+    },
+    "item": {
+    },
+    "netcdf_asset": {
+    },
+    "kerchunk_asset": {
+    }
+  },
+  "global_attrs": [
+    "Conventions"
+  ],
+  "global_attr_map": {
+    "spatial_resolution": "resolution",
+    "summary": "description"
+  },
+  "templated_properties": {
+    "platform": "${platform}",
+    "instruments:comma_separated_list": "${sensor}"
+  },
+  "thumbnail": {
+    "variable": "AOD550_mean",
+    "cmap": "magma",
+    "vmin": 0,
+    "vmax": 1,
+    "x-coordinate": "longitude",
+    "y-coordinate": "latitude",
+    "width": 400,
+    "background_image_path": "world.png"
+  },
+  "providers": [
+    {
+      "name": "Swansea University",
+      "roles": [
+        "producer"
+      ],
+      "url": "https://www.swansea.ac.uk/staff/science/geography/p.r.j.north/"
+    },
+    {
+      "name": "Earth Observation Climate Information Service (EOCIS)",
+      "roles": [
+        "producer"
+      ],
+      "url": "https://eocis.org"
+    },
+    {
+      "name": "Centre for Environmental Data Analysis (CEDA)",
+      "roles": [
+        "host"
+      ],
+      "url": "https://ceda.ac.uk"
+    }
+  ]
+}
