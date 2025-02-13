@@ -3,14 +3,14 @@
   "metadata_dir": "sst-metadata",
   "stac_collection_id": "eocis-sst-cdrv3",
   "title": "EOCIS Sea-Surface Temperatures V3",
-  "description": "This dataset provides daily estimates of global sea surface temperature (SST) based on observations from multiple satellite sensors. Resolution: 5km.  Available from 1980 onwards.",
+  "description": "This dataset provides daily-mean sea surface temperatures (SST), presented on global 0.05° latitude-longitude grid, spanning 1980 to present. This is a Level 4 product, with gaps between available daily observations filled by statistical means.  The SST CCI Analysis product contains estimates of daily mean SST and sea ice concentration. Each SST value has an associated uncertainty estimate. The dataset has been produced as part of the version 3 Climate Data Record (CDR) produced by the European Space Agency (ESA) Climate Change Initiative Sea Surface Temperature project (ESA SST_cci). The CDR accurately maps the surface temperature of the global oceans over the period 1980 to 2021 using observations from many satellites, with a high degree of independence from in situ measurements. The data provide independently quantified SSTs to a quality suitable for climate research.  Data from 2022 onwards are provided as an Interim Climate Data Record (ICDR) and will be updated daily at one month behind present. The Copernicus Climate Change Service (C3S) funded the development of the ICDR extension and production of the ICDR during 2022. From 2023 onwards the production of the ICDR is funded by the UK Earth Observation Climate Information Service (EOCIS) and Marine and Climate Advisory Service (MCAS).",
   "file_id_attribute": "tracking_id",
   "variable": "analysed_sst",
   "license": "cc-by-4.0",
   "keywords": ["Oceans", "Ocean Temperature", "Sea Surface Temperature"],
   "defaults": {
     "all": {
-      "sci:doi": "https://doi.org/10.1038/s41597-024-03147-w",
+      "sci:doi": "https://dx.doi.org/10.5285/4a9654136a7148e39b7feb56f8bb02d2",
       "sci:citation": "Users of these data should cite the dataset along with the dataset paper: Embury, O. et al. Satellite-based time-series of sea-surface temperature since 1980 for climate applications. Scientific Data (2024). https://doi.org/10.1038/s41597-024-03147-w",
       "sci:publications": [
         {
@@ -72,7 +72,8 @@
             "lat",
             "lon"
           ],
-          "type": "data"
+          "type": "data",
+          "unit": "1"
         }
       }
     },
@@ -103,5 +104,28 @@
     "vmax": 310,
     "x-coordinate": "lon",
     "y-coordinate": "lat"
-  }
+  },
+  "providers": [
+    {
+      "name": "Met Office",
+      "roles": [
+        "producer"
+      ],
+      "url": "https://www.metoffice.gov.uk"
+    },
+    {
+      "name": "Earth Observation Climate Information Service (EOCIS)",
+      "roles": [
+        "producer"
+      ],
+      "url": "https://eocis.org"
+    },
+    {
+      "name": "Centre for Environmental Data Analysis (CEDA)",
+      "roles": [
+        "host"
+      ],
+      "url": "https://ceda.ac.uk"
+    }
+  ]
 }

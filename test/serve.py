@@ -49,7 +49,7 @@ if __name__ == '__main__':
     print("Paste the following URLs into the radiant earth STAC browser (https://radiantearth.github.io/stac-browser/#/):")
     for root,dirs,files  in os.walk(os.path.join(webroot,"stac-generated")):
         for file in files:
-            if file.endswith(".geojson"):
+            if file.endswith(".geojson") or file == "collection.json":
                 filepath = os.path.join(root,file)
                 relpath = os.path.relpath(filepath,webroot)
                 print("\thttp://%s:%d/%s"%(args.host,args.port,relpath))

@@ -1,0 +1,18 @@
+{
+  "defaults": {
+    "all": {
+      "sci:doi": "https://dx.doi.org/10.5285/a89007aa668d4e2f940dbb3d3dfcc3dc"
+    }
+  },
+  "description": "This dataset contains the level-3 monthly mean aerosol properties products from Sentinel-3B SLSTR satellite observations. Data are processed using the Swansea University algorithm",
+  "title": "EOCIS AEROSOL from Sentinel 3B monthly",
+  "templated_properties": {
+    "platform": "${platform}",
+    "instruments:comma_separated_list": "${sensor}",
+    "title": "EOCIS AEROSOL from Sentinel 3B monthly ${year}-${month}"
+  },
+  "stac_collection_id": "eocis-aerosol-slstr-monthly-s3b",
+  "netcdf_url": "https://dap.ceda.ac.uk/neodc/eocis/data/global_and_regional/SU_aerosol/SLSTR/L3C/monthly/v1.14.1/SLSTR-B/{year}/",
+  "kerchunk_url": "https://eocis.org/data/eocis-aerosol-slstr-monthly-s3b/{year}/{month:02}/",
+  "thumbnail_url": "https://eocis.org/data/eocis-aerosol-slstr-monthly-s3b/{year}/{month:02}/"
+}

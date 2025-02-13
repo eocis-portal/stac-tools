@@ -194,33 +194,35 @@ class Netcdf2Stac:
             self.climatology_interval = (datetime.datetime.strptime(self.config["climatology_interval"][0],"%Y-%m-%d"),datetime.datetime.strptime(self.config["climatology_interval"][1],"%Y-%m-%d"))
 
         if os.path.exists(self.collection_path):
+            # read start/end dates from the existing collection
             with open(self.collection_path) as f:
                 o = json.loads(f.read())
-                self.collection = pystac.Collection.from_dict(o)
-                self.start_date = self.collection.extent.temporal.intervals[0][0]
-                self.end_date = self.collection.extent.temporal.intervals[0][1]
-                self.bbox = self.collection.extent.spatial.bboxes[0]
+                old_collection = pystac.Collection.from_dict(o)
+                self.start_date = old_collection.extent.temporal.intervals[0][0]
+                self.end_date = old_collection.extent.temporal.intervals[0][1]
+                self.bbox = old_collection.extent.spatial.bboxes[0]
                 self.logger.info(f"Loaded existing collection {self.start_date} - {self.end_date}")
-        else:
-            extra_fields = {}
-            for (key,value) in self.config.get("defaults",{}).get("all",{}).items():
-                extra_fields[key] = copy.deepcopy(value)
-            for (key,value) in self.config.get("defaults",{}).get("collection",{}).items():
-                extra_fields[key] = copy.deepcopy(value)
-            providers = []
-            for p in self.config.get("providers",[]):
-                providers.append(pystac.Provider(**p))
-            self.collection = pystac.Collection(id=self.config.get("stac_collection_id", str(uuid.uuid4())),
-                                                href=self.collection_filename,
-                                                extent=None,
-                                                extra_fields=extra_fields,
-                                                license=self.config["license"],
-                                                keywords=self.config.get("keywords",None),
-                                                title=self.config.get("title", ""),
-                                                description=self.config.get("description", ""),
-                                                stac_extensions=self.config.get("stac-extensions",[]),
-                                                catalog_type=pystac.CatalogType.SELF_CONTAINED,
-                                                providers=providers)
+
+        extra_fields = {}
+        for (key,value) in self.config.get("defaults",{}).get("all",{}).items():
+            extra_fields[key] = copy.deepcopy(value)
+        for (key,value) in self.config.get("defaults",{}).get("collection",{}).items():
+            extra_fields[key] = copy.deepcopy(value)
+        providers = []
+        for p in self.config.get("providers",[]):
+            providers.append(pystac.Provider(**p))
+
+        self.collection = pystac.Collection(id=self.config.get("stac_collection_id", str(uuid.uuid4())),
+                                            href=self.collection_filename,
+                                            extent=None,
+                                            extra_fields=extra_fields,
+                                            license=self.config["license"],
+                                            keywords=self.config.get("keywords",None),
+                                            title=self.config.get("title", ""),
+                                            description=self.config.get("description", ""),
+                                            stac_extensions=self.config.get("stac-extensions",[]),
+                                            catalog_type=pystac.CatalogType.SELF_CONTAINED,
+                                            providers=providers)
 
         if "thumbnail" in self.config:
             tcfg = self.config["thumbnail"]
@@ -323,12 +325,19 @@ class Netcdf2Stac:
                     self.logger.info(f"Skipping item {fpath}, output already exists")
                     return
 
+        # establish a unique ID for this item
+        item_id = str(uuid.uuid4())
+
+        # if the item already exists, re-use its id
+        if os.path.exists(output_filepath):
+            with open(output_filepath) as f:
+                o = json.loads(f.read())
+                item_id = o["id"]
+
         if self.start_date is None or dt < self.start_date:
             self.start_date = dt
         if self.end_date is None or dt > self.end_date:
             self.end_date = dt
-
-        item_id = str(uuid.uuid4())
 
         props = {}
         for (key, value) in self.config.get("defaults", {}).get("all", {}).items():
@@ -366,7 +375,11 @@ class Netcdf2Stac:
                 prop = prop_comps[0]
                 directive = prop_comps[1] if len(prop_comps) > 1 else None
                 template = Template(tmpl)
-                v = template.render(**i.get_dataset().attrs)
+                template_properties = copy.deepcopy(i.get_dataset().attrs)
+                template_properties["year"] = f"{dt.year:04d}"
+                template_properties["month"] = f"{dt.month:02d}"
+                template_properties["day"] = f"{dt.day:02d}"
+                v = template.render(**template_properties)
                 if directive == "comma_separated_list":
                     v = list(map(lambda s: s.strip(),v.split(",")))
                 props[prop] = v
@@ -397,7 +410,6 @@ class Netcdf2Stac:
                            stac_extensions=self.config.get("stac-extensions",[]),
                            **date_arguments)
 
-
         item.clear_links()
 
         if self.collection_path:
@@ -412,7 +424,9 @@ class Netcdf2Stac:
         if self.generate_kerchunk_assets:
             kerchunk_asset_dict = get_kerchunk_asset_dict(kerchunk_filename, self.config, dt, i.get_dataset().attrs)
 
-            generate_kerchunk(fpath, netcdf_href, kerchunk_filepath)
+            if self.overwrite_items or not os.path.exists(kerchunk_filepath):
+                generate_kerchunk(fpath, netcdf_href, kerchunk_filepath)
+
             href = kerchunk_asset_dict["href"]
             del kerchunk_asset_dict["href"]
             if self.inline_kerchunk:
@@ -449,9 +463,10 @@ class Netcdf2Stac:
                                  media_type="image/png",
                                  extra_fields=asset_dict)
 
-        with open(output_filepath,"w") as f:
-            o = item.to_dict(include_self_link=False)
-            f.write(json.dumps(o,indent=4))
+        if self.overwrite_items or not os.path.exists(output_filepath):
+            with open(output_filepath,"w") as f:
+                o = item.to_dict(include_self_link=False)
+                f.write(json.dumps(o,indent=4))
 
         if return_thumbnail_asset:
             return thumbnail_asset
