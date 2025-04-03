@@ -1,0 +1,156 @@
+{
+  "stac_collection_id": "eocis-arctic-sea-ice-thickness-monthly",
+  "title": "EOCIS Arctic Monthly Gridded Sea Ice Thickness Product from CryoSat-2",
+  "description": "The sea ice products provide a 5x5 km grid of Arctic sea ice thickness (for the whole Arctic region and of 17 sub-regions), delivered as NetCDF files.  EOCIS sea ice thickness NetCDF products are generated monthly by the Centre for Polar Observation and Modelling (CPOM) from radar altimetry measurements taken from the ESA CryoSAT-2 satellite during the winter months (Oct-Apr). Sea ice thickness is only reliably measured from satellite radar altimetry during the winter months. During summer, melt ponds can form on the sea ice floes making it difficult for the satellite to differentiate between floes and leads, and hence calculate sea ice freeboard (and subsequently thickness). Measurement during summer months using radar altimetry is an area of active research (Landy et al, 2022) but is not yet operationally processed.",
+  "variable": "sea_ice_thickness",
+  "license": "cc-by-4.0",
+  "keywords": [
+    "Sea Ice",
+    "Thickness",
+    "Radar Altimeters"
+  ],
+  "defaults": {
+    "all": {
+      "sci:doi": "https://dx.doi.org/10.5285/4c246cb11aa04651a0182b2d329a84f9",
+      "sci:citation": "Ridout, A.; Palmer, B.; Muir, A.; Swiggs, A.; McMillan, M.; Maddalena, J. (2025): EOCIS: Arctic Sea Ice Thickness Grids, v1.00. NERC EDS Centre for Environmental Data Analysis, 20 March 2025. doi:10.5285/4c246cb11aa04651a0182b2d329a84f9.",
+      "sci:publications": [
+      ],
+      "cube:dimensions": {
+        "xc": {
+          "type": "spatial",
+          "axis": "xc",
+          "extent": [
+            -3850000,
+            3749999
+          ],
+          "reference_system": 3413,
+          "unit": "m"
+        },
+        "yc": {
+          "type": "spatial",
+          "axis": "yc",
+          "extent": [
+            -5350000,
+            5849999
+          ],
+          "reference_system": 3413,
+          "unit": "m"
+        },
+        "time": {
+          "type": "temporal",
+          "step": "P1M"
+        }
+      },
+      "cube:variables": {
+        "sea_ice_thickness": {
+          "description": "sea ice thickness",
+          "dimensions": [
+            "time",
+            "yc",
+            "xc"
+          ],
+          "type": "data",
+          "unit": "m"
+        },
+        "sea_ice_thickness_stdev": {
+          "description": "standard deviation of sea ice thickness, defined as the standard deviation of the thickness in the grid cell",
+          "dimensions": [
+            "time",
+            "yc",
+            "xc"
+          ],
+          "type": "data",
+          "unit": "m"
+        },
+        "n_thickness_measurements": {
+          "description": "number of contributing thickness measurements",
+          "dimensions": [
+            "time",
+            "yc",
+            "xc"
+          ],
+          "type": "auxiliary"
+        }
+      },
+      "renders": {
+        "sea_ice_thickness": {
+          "title": "Sea Ice Thickness",
+          "assets": [
+            "reference_file"
+          ],
+          "reference": true,
+          "variable": "sea_ice_thickness",
+          "colormap_name": "blues_r",
+          "rescale": [
+            0,
+            3.5
+          ]
+        },
+        "sea_ice_thickness_stdev": {
+          "title": "Standard deviation of Sea Ice Thickness",
+          "assets": [
+            "reference_file"
+          ],
+          "reference": true,
+          "variable": "analysed_sst_uncertainty",
+          "colormap_name": "viridis",
+          "rescale": [
+            0,
+            2
+          ]
+        }
+      }
+    },
+    "item": {
+    },
+    "netcdf_asset": {
+    },
+    "kerchunk_asset": {
+    }
+  },
+  "global_attrs": [
+    "Conventions"
+  ],
+  "global_attr_map": {
+    "spatial_resolution": "resolution"
+  },
+  "templated_properties": {
+    "platform": "${platform}",
+    "instruments:comma_separated_list": "${sensor}",
+    "title": "EOCIS Sea-Surface Temperatures V3 ${year}-${month}-${day}"
+  },
+  "netcdf_url": "https://dap.ceda.ac.uk/neodc/eocis/data/global_and_regional/arctic_sea_ice/arctic_sea_ice_thickness_grids/L3C/monthly/v1.0/",
+  "kerchunk_url": "https://gws-access.jasmin.ac.uk/public/nceo_uor/eocis-stac/eocis-arctic-sea-ice-thickness-monthly-aux/items/{year}/{month:02}/",
+  "thumbnail_url": "https://gws-access.jasmin.ac.uk/public/nceo_uor/eocis-stac/eocis-arctic-sea-ice-thickness-monthly-aux/items/{year}/{month:02}/",
+  "thumbnail": {
+    "variable": "sea_ice_thickness",
+    "cmap": "blues_r",
+    "vmin": 0,
+    "vmax": 3.5,
+    "x-coordinate": "xc",
+    "y-coordinate": "yc"
+  },
+  "providers": [
+    {
+      "name": "Andy Ridout, Alan Muir (CPOM, University College London)",
+      "roles": [
+        "producer"
+      ],
+      "url": "http://www.cpom.org.uk"
+    },
+    {
+      "name": "Earth Observation Climate Information Service (EOCIS)",
+      "roles": [
+        "producer"
+      ],
+      "url": "https://eocis.org"
+    },
+    {
+      "name": "Centre for Environmental Data Analysis (CEDA)",
+      "roles": [
+        "host"
+      ],
+      "url": "https://ceda.ac.uk"
+    }
+  ]
+}

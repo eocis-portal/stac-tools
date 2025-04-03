@@ -22,5 +22,8 @@
   "thumbnail": {
     "width": 768
   },
-  "stac-extensions": ["https://stac-extensions.github.io/datacube/v2.2.0/schema.json","https://stac-extensions.github.io/scientific/v1.0.0/schema.json"]
+  "stac-extensions": ["https://stac-extensions.github.io/datacube/v2.2.0/schema.json",
+    "https://stac-extensions.github.io/scientific/v1.0.0/schema.json",
+    "https://stac-extensions.github.io/render/v2.0.0/schema.json"
+  ]
 }

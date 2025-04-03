@@ -3,7 +3,7 @@
 conda activate stac_tools_env
 
 # output_folder=stac
-output_folder=/gws/nopw/j04/eocis_chuk/stac-tmp
+output_folder=/gws/nopw/j04/nceo_uor/public/eocis-stac
 
 netcdf2stac --base-folder $output_folder/sst-cdrv3 \
     --auxilary-folder $output_folder/sst-cdrv3-aux \
@@ -12,4 +12,5 @@ netcdf2stac --base-folder $output_folder/sst-cdrv3 \
     --item-subfolder "items/{year}/{month:02d}/" \
     --config-paths ../../configurations/eocis-defaults.json ../../configurations/sst.json \
     --include-kerchunk \
-    --include-collection-thumbnail
+    --include-collection-thumbnail \
+    --overwrite-items

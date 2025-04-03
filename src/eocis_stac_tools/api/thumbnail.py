@@ -44,7 +44,15 @@ class Thumbnail:
 
         self.cmap_colours = []
 
-        cmap_path = os.path.join(os.path.split(__file__)[0], "cmaps", cmap + ".json")
+        cmaps_folder = os.path.join(os.path.split(__file__)[0], "cmaps")
+
+        # get a consistent lower case based cmap lookup
+        self.cmaps_paths = {}
+        for filename in os.listdir(cmaps_folder):
+            if filename.endswith(".json"):
+                self.cmaps_paths[os.path.splitext(filename)[0].lower()] = filename
+
+        cmap_path = os.path.join(cmaps_folder, self.cmaps_paths[cmap.lower()])
 
         with open(cmap_path) as f:
             o = json.loads(f.read())

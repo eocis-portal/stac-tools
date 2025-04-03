@@ -7,7 +7,11 @@
   "file_id_attribute": "tracking_id",
   "variable": "analysed_sst",
   "license": "cc-by-4.0",
-  "keywords": ["Oceans", "Ocean Temperature", "Sea Surface Temperature"],
+  "keywords": [
+    "Oceans",
+    "Ocean Temperature",
+    "Sea Surface Temperature"
+  ],
   "defaults": {
     "all": {
       "sci:doi": "https://dx.doi.org/10.5285/4a9654136a7148e39b7feb56f8bb02d2",
@@ -75,6 +79,47 @@
           "type": "data",
           "unit": "1"
         }
+      },
+      "renders": {
+        "analysed_sst": {
+          "title": "Sea Surface Temperatures (Kelvin)",
+          "assets": [
+            "reference_file"
+          ],
+          "reference": true,
+          "variable": "analysed_sst",
+          "colormap_name": "turbo",
+          "rescale": [
+            270,
+            320
+          ]
+        },
+        "analysed_sst_uncertainty": {
+          "title": "Sea Surface Temperature Uncertainty (Kelvin)",
+          "assets": [
+            "reference_file"
+          ],
+          "reference": true,
+          "variable": "analysed_sst_uncertainty",
+          "colormap_name": "viridis",
+          "rescale": [
+            0,
+            2
+          ]
+        },
+        "sea_ice_fraction": {
+          "title": "Sea Ice Area Fraction",
+          "assets": [
+            "reference_file"
+          ],
+          "reference": true,
+          "variable": "sea_ice_fraction",
+          "colormap_name": "blues_r",
+          "rescale": [
+            0,
+            1
+          ]
+        }
       }
     },
     "item": {
@@ -91,17 +136,18 @@
     "spatial_resolution": "resolution"
   },
   "templated_properties": {
-     "platform": "${platform}",
-     "instruments:comma_separated_list": "${sensor}"
+    "platform": "${platform}",
+    "instruments:comma_separated_list": "${sensor}",
+    "title": "EOCIS Sea-Surface Temperatures V3 ${year}-${month}-${day}"
   },
   "netcdf_url": "https://dap.ceda.ac.uk/neodc/eocis/data/global_and_regional/sea_surface_temperature/CDR_v3/Analysis/L4/v3.0.1/{year}/{month:02}/{day:02}/",
-  "kerchunk_url": "https://eocis.org/data/sst-cdrv3-kerchunk/{year}/{month:02}/",
-  "thumbnail_url": "https://eocis.org/data/sst-cdrv3-kerchunk/{year}/{month:02}/",
+  "kerchunk_url": "https://gws-access.jasmin.ac.uk/public/nceo_uor/eocis-stac/sst-cdrv3-aux/items/{year}/{month:02}/",
+  "thumbnail_url": "https://gws-access.jasmin.ac.uk/public/nceo_uor/eocis-stac/sst-cdrv3-aux/items/{year}/{month:02}/",
   "thumbnail": {
     "variable": "analysed_sst",
     "cmap": "turbo",
     "vmin": 270,
-    "vmax": 310,
+    "vmax": 320,
     "x-coordinate": "lon",
     "y-coordinate": "lat"
   },

@@ -2,7 +2,7 @@
 
 conda activate stac_tools_env
 
-output_folder=/gws/nopw/j04/eocis_chuk/stac-tmp
+output_folder=/gws/nopw/j04/nceo_uor/public/eocis-stac
 
 . ../env.sh
 
