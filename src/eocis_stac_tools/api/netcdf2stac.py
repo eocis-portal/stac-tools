@@ -242,7 +242,8 @@ class Netcdf2Stac:
                 x_coord=tcfg["x-coordinate"],
                 y_coord=tcfg["y-coordinate"],
                 plot_width=tcfg["width"],
-                background_image_path=background_image_path
+                background_image_path=background_image_path,
+                selector=tcfg.get("selector",{})
             )
         else:
             self.thumbnail_generator = None
@@ -254,6 +255,10 @@ class Netcdf2Stac:
         all_paths = []
         for input_pattern in self.input_paths:
             all_paths += glob.glob(input_pattern,recursive=True)
+
+        if len(all_paths) == 0:
+            print("No input files found")
+            return
 
         thumbnail_asset = None
         for idx in range(len(all_paths)):

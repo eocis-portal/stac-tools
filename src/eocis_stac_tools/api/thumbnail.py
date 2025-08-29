@@ -32,7 +32,8 @@ from PIL import Image
 
 class Thumbnail:
 
-    def __init__(self, variable, cmap, vmin, vmax, x_coord, y_coord, plot_width, background_image_path=None, background_alpha=0.2):
+    def __init__(self, variable, cmap, vmin, vmax, x_coord, y_coord, plot_width, background_image_path=None, background_alpha=0.2,
+                 selector={}):
         self.variable = variable
         self.background_image_path = background_image_path
         self.background_alpha = background_alpha
@@ -41,6 +42,7 @@ class Thumbnail:
         self.x_coord = x_coord
         self.y_coord = y_coord
         self.plot_width = plot_width
+        self.selector = selector
 
         self.cmap_colours = []
 
@@ -52,6 +54,11 @@ class Thumbnail:
             if filename.endswith(".json"):
                 self.cmaps_paths[os.path.splitext(filename)[0].lower()] = filename
 
+        reverse_cmap = False
+        if cmap.endswith("_r"):
+            cmap = cmap[:-2]
+            reverse_cmap = True
+
         cmap_path = os.path.join(cmaps_folder, self.cmaps_paths[cmap.lower()])
 
         with open(cmap_path) as f:
@@ -62,10 +69,13 @@ class Thumbnail:
                 b = int(255 * rgb[2])
                 self.cmap_colours.append(f"#{r:02X}{g:02X}{b:02X}")
 
+        if reverse_cmap:
+            self.cmap_colours.reverse()
 
     def generate(self, dataset, output_path):
         da = dataset[self.variable]
-
+        if (self.selector):
+            da = da.isel(**self.selector)
         da = da.squeeze()
 
         if len(da.shape) != 2:

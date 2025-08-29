@@ -1,0 +1,117 @@
+{
+  "stac_collection_id": "eocis-soil-moisture-africa",
+  "title": "EOCIS Soil Moisture Africa v2.3.1",
+  "description": "This dataset contains Africa-wide soil moisture and related water balance variables produced within the Earth Observation Climate Information Service (EOCIS) project.\n\nThe product is derived using the JULES land surface model, forced with TAMSAT satellite rainfall estimates and other meteorological variables from the NCEP reanalysis, and tuned to NASA SMAP satellite soil moisture observations. Data are provided at the daily scale, from 1983-01-01 to present (latency around 7 days) at 0.25 degrees by 0.25 degrees spatial resolution.",
+  "variable": "fsmc",
+  "license": "cc-by-4.0",
+  "keywords": [
+    "Soil Moisture",
+    "Africa"
+  ],
+  "defaults": {
+    "all": {
+      "sci:doi": "https://dx.doi.org/10.5285/083f0a37e058495eaef542263198019f",
+      "sci:citation": "Users of these data should cite University of Reading; Maidment, R.; Quaife, T.; Pinnington, E.; Black, E.; Ejigu, A.; Kumar, D.; Thomas, S. (2025): EOCIS: Soil Moisture Africa, v2.3.1. NERC EDS Centre for Environmental Data Analysis, 17 June 2025. doi:10.5285/083f0a37e058495eaef542263198019f",
+      "sci:publications": [
+      ],
+      "cube:dimensions": {
+        "lon": {
+          "type": "spatial",
+          "axis": "x",
+          "extent": [
+            -17.875,
+            51.375
+          ],
+          "reference_system": 4326,
+          "unit": "degrees_east"
+        },
+        "lat": {
+          "type": "spatial",
+          "axis": "y",
+          "extent": [
+            -35.375,
+            37.375
+          ],
+          "reference_system": 4326,
+          "unit": "degrees_north"
+        },
+        "time": {
+          "type": "temporal",
+          "step": "P1D"
+        },
+        "pft": {
+          "type": "pft",
+          "description": "Plant Functional Type",
+          "values": [0,1,2,3,4]
+        }
+      },
+      "cube:variables": {
+        "fsmc": {
+          "description": "PFT soil moisture availability factor (beta)",
+          "dimensions": [
+            "time",
+            "pft",
+            "lat",
+            "lon"
+          ],
+          "type": "data",
+          "unit": "1"
+        }
+      },
+      "renders": {
+      }
+    },
+    "item": {
+    },
+    "netcdf_asset": {
+    },
+    "kerchunk_asset": {
+    }
+  },
+  "global_attrs": [
+    "Conventions"
+  ],
+  "global_attr_map": {
+    "spatial_resolution": "resolution"
+  },
+  "templated_properties": {
+    "title": "EOCIS Soil Moisture Africa v2.3.1 ${year}-${month}-${day}"
+  },
+  "netcdf_url": "https://dap.ceda.ac.uk/neodc/eocis/data/global_and_regional/soil_moisture_africa/v2.3.1/daily/{year}/{month:02}/",
+  "kerchunk_url": "https://gws-access.jasmin.ac.uk/public/nceo_uor/eocis-stac/soil-moisture-africa-aux/items/{year}/{month:02}/",
+  "thumbnail_url": "https://gws-access.jasmin.ac.uk/public/nceo_uor/eocis-stac/soil-moisture-africa-aux/items/{year}/{month:02}/",
+  "thumbnail": {
+    "variable": "fsmc",
+    "selector": {
+      "pft": 3
+    },
+    "cmap": "viridis_r",
+    "vmin": 0,
+    "vmax": 1,
+    "x-coordinate": "lon",
+    "y-coordinate": "lat"
+  },
+  "providers": [
+    {
+      "name": "University of Reading / TAMSAT",
+      "roles": [
+        "producer"
+      ],
+      "url": "https://research.reading.ac.uk/tamsat/"
+    },
+    {
+      "name": "Earth Observation Climate Information Service (EOCIS)",
+      "roles": [
+        "producer"
+      ],
+      "url": "https://eocis.org"
+    },
+    {
+      "name": "Centre for Environmental Data Analysis (CEDA)",
+      "roles": [
+        "host"
+      ],
+      "url": "https://ceda.ac.uk"
+    }
+  ]
+}
