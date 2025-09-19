@@ -78,8 +78,8 @@
     "title": "EOCIS Soil Moisture Africa v2.3.1 ${year}-${month}-${day}"
   },
   "netcdf_url": "https://dap.ceda.ac.uk/neodc/eocis/data/global_and_regional/soil_moisture_africa/v2.3.1/daily/{year}/{month:02}/",
-  "kerchunk_url": "https://gws-access.jasmin.ac.uk/public/nceo_uor/eocis-stac/soil-moisture-africa-aux/items/{year}/{month:02}/",
-  "thumbnail_url": "https://gws-access.jasmin.ac.uk/public/nceo_uor/eocis-stac/soil-moisture-africa-aux/items/{year}/{month:02}/",
+  "kerchunk_url": "https://eocis.org/data/soil-moisture-africa/items/{year}/{month:02}/",
+  "thumbnail_url": "https://eocis.org/data/soil-moisture-africa/items/{year}/{month:02}/",
   "thumbnail": {
     "variable": "fsmc",
     "selector": {

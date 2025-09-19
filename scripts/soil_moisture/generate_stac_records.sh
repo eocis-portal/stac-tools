@@ -4,10 +4,10 @@ conda init
 
 conda activate stac_tools_env
 
-# output_folder=/gws/nopw/j04/eocis_chuk/stac-tmp
-output_folder=/home/dev/github/stac-tools/scripts/soil_moisture/outputs
-input_paths=/neodc/eocis/data/global_and_regional/soil_moisture_africa
-input_paths=/home/dev/github/driafs/data/soil_moisture/*/*/*.nc
+output_folder=stac-tmp
+
+input_paths=/neodc/eocis/data/global_and_regional/soil_moisture_africa/v2.3.1/daily/*/*/*.nc
+
 echo Generating STAC records for eocis-africa-soil-moisture
 
 netcdf2stac --base-folder $output_folder/eocis-soil-moisture-africa \
