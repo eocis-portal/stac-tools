@@ -1,0 +1,73 @@
+{
+  "timestamp": "2023-07-01",
+  "title": "EOCIS CHUK Geospatial Information - Built Area",
+  "description": "Urban and suburban area fractions, derived from the UKCEH 10m land cover data",
+  "variable": "urban_area",
+  "license": "cc-by-4.0",
+  "keywords": [
+    "Land Cover",
+    "UK"
+  ],
+  "defaults": {
+    "item": {
+      "cube:variables": {
+        "urban_area": {
+          "description": "Fraction of this cell classed as urban by the UKCEH 10m land cover data",
+          "dimensions": [
+            "y",
+            "x"
+          ],
+          "type": "data",
+          "unit": "1"
+        },
+        "suburban_area": {
+          "description": "Fraction of this cell classed as urban by the UKCEH 10m land cover data",
+          "dimensions": [
+            "y",
+            "x"
+          ],
+          "type": "data",
+          "unit": "1"
+        }
+      },
+      "renders": {
+        "urban_area": {
+          "title": "Urban Area Fraction",
+          "assets": [
+            "reference_file"
+          ],
+          "reference": true,
+          "variable": "urban_area",
+          "colormap_name": "viridis",
+          "rescale": [
+            0,
+            1
+          ]
+        },
+        "suburban_area": {
+          "title": "Suburban Area Fraction",
+          "assets": [
+            "reference_file"
+          ],
+          "reference": true,
+          "variable": "suburban_area",
+          "colormap_name": "viridis",
+          "rescale": [
+            0,
+            1
+          ]
+        }
+      }
+    },
+    "netcdf_asset": {
+    },
+    "kerchunk_asset": {
+    }
+  },
+  "netcdf_url": "https://eocis.org/data/chuk_geospatial/",
+  "kerchunk_url": "https://eocis.org/data/chuk_geospatial/",
+  "thumbnail_url": "https://eocis.org/data/chuk_geospatial/",
+  "thumbnail": {
+    "image_path": "EOCIS-CHUK_GEOSPATIAL_INFORMATION-L4-BUILTAREA-MERGED-2023-fv1.1.png"
+  }
+}

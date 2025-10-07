@@ -1,0 +1,38 @@
+{
+  "timestamp": "2023-07-01",
+  "title": "EOCIS CHUK Geospatial Information - Land Cover",
+  "description": "Land cover data on the CHUK grid derived from the UKCEH 25m land cover data",
+  "variable": "land_cover",
+  "license": "cc-by-4.0",
+  "keywords": [
+    "Land Cover",
+    "UK"
+  ],
+  "defaults": {
+    "item": {
+      "cube:variables": {
+        "land_cover": {
+          "description": "Land cover data on the CHUK grid",
+          "dimensions": [
+            "y",
+            "x"
+          ],
+          "type": "data",
+          "unit": "m"
+        }
+      },
+      "renders": {
+      }
+    },
+    "netcdf_asset": {
+    },
+    "kerchunk_asset": {
+    }
+  },
+  "netcdf_url": "https://eocis.org/data/chuk_geospatial/",
+  "kerchunk_url": "https://eocis.org/data/chuk_geospatial/",
+  "thumbnail_url": "https://eocis.org/data/chuk_geospatial/",
+  "thumbnail": {
+    "image_path": "EOCIS-CHUK_GEOSPATIAL_INFORMATION-L4-LANDCOVER-MERGED-2023-fv1.1.png"
+  }
+}

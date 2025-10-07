@@ -1,0 +1,57 @@
+{
+  "timestamp": "2023-07-01",
+  "title": "EOCIS CHUK Geospatial Information - Elevation",
+  "description": "Elevation data on the CHUK grid derived from the Copernicus Global 30m DEM data",
+  "variable": "elevation",
+  "license": "cc-by-4.0",
+  "keywords": [
+    "Elevation",
+    "DEM",
+    "UK"
+  ],
+  "defaults": {
+    "item": {
+      "cube:variables": {
+        "elevation": {
+          "description": "Elevation above sea-level, m",
+          "dimensions": [
+            "y",
+            "x"
+          ],
+          "type": "data",
+          "unit": "m"
+        }
+      },
+      "renders": {
+        "elevation": {
+          "title": "Elevation (m)",
+          "assets": [
+            "reference_file"
+          ],
+          "reference": true,
+          "variable": "elevation",
+          "colormap_name": "viridis",
+          "rescale": [
+            -65,
+            1345
+          ]
+        }
+      }
+    },
+    "netcdf_asset": {
+    },
+    "kerchunk_asset": {
+    }
+  },
+  "netcdf_url": "https://eocis.org/data/chuk_geospatial/",
+  "kerchunk_url": "https://eocis.org/data/chuk_geospatial/",
+  "thumbnail_url": "https://eocis.org/data/chuk_geospatial/",
+  "thumbnail": {
+    "variable": "elevation",
+    "cmap": "viridis",
+    "vmin": -65,
+    "vmax": 1345,
+    "x-coordinate": "x",
+    "y-coordinate": "y"
+  }
+}

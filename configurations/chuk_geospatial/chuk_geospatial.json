@@ -1,0 +1,68 @@
+{
+  "stac_collection_id": "eocis-chuk-geospatial",
+  "defaults": {
+    "all": {
+      "sci:doi": "10.5285/b766867ceadb409da64d480bdbe4057d",
+      "sci:citation": "\"Lloyd-Hughes, B.; Griffiths, G.; Roesch, M. (2025): EOCIS: Geospatial Information Files V1.1. NERC EDS Centre for Environmental Data Analysis, 27 August 2025.",
+      "sci:publications": [
+      ],
+      "cube:dimensions": {
+        "x": {
+          "type": "spatial",
+          "axis": "x",
+          "extent": [
+            -331950,
+            764950
+          ],
+          "reference_system": 27700,
+          "unit": "m"
+        },
+        "y": {
+          "type": "spatial",
+          "axis": "y",
+          "extent": [
+            -266950,
+            1249950
+          ],
+          "reference_system": 27700,
+          "unit": "m"
+        }
+      }
+    },
+    "item": {
+    },
+    "netcdf_asset": {
+    },
+    "kerchunk_asset": {
+    }
+  },
+  "global_attrs": [
+    "Conventions"
+  ],
+  "global_attr_map": {
+    "spatial_resolution": "resolution"
+  },
+  "providers": [
+    {
+      "name": "The Institute for Environmental Analytics",
+      "roles": [
+        "producer"
+      ],
+      "url": "https://the-iea.org"
+    },
+    {
+      "name": "Earth Observation Climate Information Service (EOCIS)",
+      "roles": [
+        "producer"
+      ],
+      "url": "https://eocis.org"
+    },
+    {
+      "name": "Centre for Environmental Data Analysis (CEDA)",
+      "roles": [
+        "host"
+      ],
+      "url": "https://ceda.ac.uk"
+    }
+  ]
+}
