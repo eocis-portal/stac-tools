@@ -4,8 +4,8 @@
 import xarray as xr
 import numpy as np
 
-path_landcover = "EOCIS-CHUK_GEOSPATIAL_INFORMATION-L4-LANDCOVER-MERGED-2023-fv1.1.nc"
-path_builtarea = "EOCIS-CHUK_GEOSPATIAL_INFORMATION-L4-BUILTAREA-MERGED-2023-fv1.1.nc"
+path_landcover = "../../data/EOCIS-CHUK_GEOSPATIAL_INFORMATION-L4-LANDCOVER-MERGED-2023-fv1.1.nc"
+path_builtarea = "../../data/EOCIS-CHUK_GEOSPATIAL_INFORMATION-L4-BUILTAREA-MERGED-2023-fv1.1.nc"
 
 ds = xr.open_dataset(path_landcover)
 

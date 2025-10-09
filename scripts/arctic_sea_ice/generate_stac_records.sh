@@ -2,7 +2,7 @@
 
 conda activate stac_tools_env
 
-output_folder=/gws/nopw/j04/nceo_uor/public/eocis-stac
+output_folder=stac-tmp
 
 echo Generating STAC records for eocis-arctic-sea-ice-thickness-monthly
 

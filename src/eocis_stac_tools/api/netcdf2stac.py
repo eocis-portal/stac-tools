@@ -37,6 +37,7 @@ from mako.template import Template
 import xarray as xr
 from kerchunk.hdf import SingleHdf5ToZarr
 from .thumbnail import Thumbnail
+from .static_thumbnail import StaticThumbnail
 
 def expand_dt_template(s, dt):
     return s.format(**{
@@ -146,7 +147,10 @@ class Netcdf2Stac:
         self.auxilary_base_folder = auxilary_base_folder
         self.input_paths = input_paths
         self.collection_filename = collection_filename
-        self.collection_path = os.path.join(self.base_folder,self.collection_filename)
+        if self.collection_filename:
+            self.collection_path = os.path.join(self.base_folder,self.collection_filename)
+        else:
+            self.collection_path = ""
         self.item_subfolder = item_subfolder
         self.config_paths = config_paths
 
@@ -193,7 +197,7 @@ class Netcdf2Stac:
         if "climatology_interval" in self.config:
             self.climatology_interval = (datetime.datetime.strptime(self.config["climatology_interval"][0],"%Y-%m-%d"),datetime.datetime.strptime(self.config["climatology_interval"][1],"%Y-%m-%d"))
 
-        if os.path.exists(self.collection_path):
+        if self.collection_path is not None and os.path.exists(self.collection_path):
             # read start/end dates from the existing collection
             with open(self.collection_path) as f:
                 o = json.loads(f.read())
@@ -226,25 +230,33 @@ class Netcdf2Stac:
 
         if "thumbnail" in self.config:
             tcfg = self.config["thumbnail"]
-            background_image_path = None
-            if "background_image_path" in tcfg:
+            if "image_path" in tcfg:
                 # resolve the background image path relative to the configuration files
                 for config_path in self.config_paths:
-                    background_image_path = os.path.join(os.path.split(config_path)[0],
-                                                         tcfg["background_image_path"])
-                    if os.path.exists(background_image_path):
+                    image_path = os.path.join(os.path.split(config_path)[0],tcfg["image_path"])
+                    if os.path.exists(image_path):
+                        self.thumbnail_generator = StaticThumbnail(image_path)
                         break
-            self.thumbnail_generator = Thumbnail(
-                variable=tcfg["variable"],
-                cmap=tcfg["cmap"],
-                vmin=tcfg["vmin"],
-                vmax=tcfg["vmax"],
-                x_coord=tcfg["x-coordinate"],
-                y_coord=tcfg["y-coordinate"],
-                plot_width=tcfg["width"],
-                background_image_path=background_image_path,
-                selector=tcfg.get("selector",{})
-            )
+            else:
+                background_image_path = None
+                if "background_image_path" in tcfg:
+                    # resolve the background image path relative to the configuration files
+                    for config_path in self.config_paths:
+                        background_image_path = os.path.join(os.path.split(config_path)[0],
+                                                             tcfg["background_image_path"])
+                        if os.path.exists(background_image_path):
+                            break
+                self.thumbnail_generator = Thumbnail(
+                    variable=tcfg["variable"],
+                    cmap=tcfg["cmap"],
+                    vmin=tcfg["vmin"],
+                    vmax=tcfg["vmax"],
+                    x_coord=tcfg["x-coordinate"],
+                    y_coord=tcfg["y-coordinate"],
+                    plot_width=tcfg["width"],
+                    background_image_path=background_image_path,
+                    selector=tcfg.get("selector",{})
+                )
         else:
             self.thumbnail_generator = None
 
@@ -280,8 +292,9 @@ class Netcdf2Stac:
         extra_time = self.collection.extra_fields.get("cube:dimensions",{}).get("time",None)
         if extra_time:
             extra_time["extent"] = [fmt_date(self.start_date), fmt_date(self.end_date)]
-        with open(self.collection_path, "w") as f:
-            f.write(json.dumps(self.collection.to_dict(include_self_link=False), indent=4))
+        if self.collection_path is not None:
+            with open(self.collection_path, "w") as f:
+                f.write(json.dumps(self.collection.to_dict(include_self_link=False), indent=4))
 
     def process_item(self, fpath, return_thumbnail_asset=False):
         input_filename = os.path.split(fpath)[-1]
@@ -314,7 +327,10 @@ class Netcdf2Stac:
             if max_y > self.bbox[3]:
                 self.bbox[3] = max_y
 
-        dt = i.get_datetime(0)
+        if "timestamp" in self.config:
+            dt = datetime.datetime.fromisoformat(self.config["timestamp"])
+        else:
+            dt = i.get_datetime(0)
 
         item_subfolder = expand_dt_template(self.item_subfolder,dt)
         os.makedirs(os.path.join(self.base_folder, item_subfolder), exist_ok=True)
@@ -374,22 +390,23 @@ class Netcdf2Stac:
             props["description"] = description
 
         # Add templated properties
-        for prop, tmpl in self.config["templated_properties"].items():
-            try:
-                prop_comps = prop.split(":")
-                prop = prop_comps[0]
-                directive = prop_comps[1] if len(prop_comps) > 1 else None
-                template = Template(tmpl)
-                template_properties = copy.deepcopy(i.get_dataset().attrs)
-                template_properties["year"] = f"{dt.year:04d}"
-                template_properties["month"] = f"{dt.month:02d}"
-                template_properties["day"] = f"{dt.day:02d}"
-                v = template.render(**template_properties)
-                if directive == "comma_separated_list":
-                    v = list(map(lambda s: s.strip(),v.split(",")))
-                props[prop] = v
-            except Exception as ex:
-                print(f"warning, unable to resolve template {prop} {tmpl}: {ex}")
+        if "templated_properties" in self.config:
+            for prop, tmpl in self.config["templated_properties"].items():
+                try:
+                    prop_comps = prop.split(":")
+                    prop = prop_comps[0]
+                    directive = prop_comps[1] if len(prop_comps) > 1 else None
+                    template = Template(tmpl)
+                    template_properties = copy.deepcopy(i.get_dataset().attrs)
+                    template_properties["year"] = f"{dt.year:04d}"
+                    template_properties["month"] = f"{dt.month:02d}"
+                    template_properties["day"] = f"{dt.day:02d}"
+                    v = template.render(**template_properties)
+                    if directive == "comma_separated_list":
+                        v = list(map(lambda s: s.strip(),v.split(",")))
+                    props[prop] = v
+                except Exception as ex:
+                    print(f"warning, unable to resolve template {prop} {tmpl}: {ex}")
 
         if self.climatology_interval is not None:
             props["day_of_year"] = dt.timetuple()[7]
@@ -467,6 +484,8 @@ class Netcdf2Stac:
                                  roles=["thumbnail"],
                                  media_type="image/png",
                                  extra_fields=asset_dict)
+            # add the thumbnail asset to the item as well
+            item.add_asset("thumbnail", thumbnail_asset)
 
         if self.overwrite_items or not os.path.exists(output_filepath):
             with open(output_filepath,"w") as f:

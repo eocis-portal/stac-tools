@@ -92,7 +92,7 @@
             "reference_file"
           ],
           "reference": true,
-          "variable": "analysed_sst_uncertainty",
+          "variable": "sea_ice_thickness_stdev",
           "colormap_name": "viridis",
           "rescale": [
             0,
@@ -117,7 +117,7 @@
   "templated_properties": {
     "platform": "${platform}",
     "instruments:comma_separated_list": "${sensor}",
-    "title": "EOCIS Sea-Surface Temperatures V3 ${year}-${month}-${day}"
+    "title": "EOCIS Arctic Monthly Gridded Sea Ice Thickness ${year}-${month}-${day}"
   },
   "netcdf_url": "https://dap.ceda.ac.uk/neodc/eocis/data/global_and_regional/arctic_sea_ice/arctic_sea_ice_thickness_grids/L3C/monthly/v1.0/",
   "kerchunk_url": "https://gws-access.jasmin.ac.uk/public/nceo_uor/eocis-stac/eocis-arctic-sea-ice-thickness-monthly-aux/items/{year}/{month:02}/",

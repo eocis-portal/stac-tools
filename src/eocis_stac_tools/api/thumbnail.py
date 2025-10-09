@@ -81,6 +81,10 @@ class Thumbnail:
         if len(da.shape) != 2:
             raise Exception(f"too many dimensions to plot {da.dims}")
 
+        if dataset[self.y_coord].data[0].item() > dataset[self.y_coord].data[1].item():
+            y_dim = da.dims[0]
+            da = da.isel(**{y_dim: slice(None, None, -1)})
+
         h = da.shape[0]
         w = da.shape[1]
 
