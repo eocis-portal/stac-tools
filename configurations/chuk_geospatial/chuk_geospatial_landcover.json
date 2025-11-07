@@ -1,4 +1,5 @@
 {
+  "stac_collection_id": "eocis-chuk-geospatial-landcover",
   "timestamp": "2023-07-01",
   "title": "EOCIS CHUK Geospatial Information - Land Cover",
   "description": "Land cover data on the CHUK grid derived from the UKCEH 25m land cover data",
@@ -29,7 +30,7 @@
     "kerchunk_asset": {
     }
   },
-  "netcdf_url": "https://eocis.org/data/chuk_geospatial/",
+  "netcdf_url": "https://dap.ceda.ac.uk/neodc/eocis/data/CHUK/geospatial_information/v1.1/",
   "kerchunk_url": "https://eocis.org/data/chuk_geospatial/",
   "thumbnail_url": "https://eocis.org/data/chuk_geospatial/",
   "thumbnail": {

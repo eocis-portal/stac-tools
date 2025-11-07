@@ -1,0 +1,57 @@
+{
+    "type": "Collection",
+    "id": "eocis-chuk-geospatial",
+    "stac_version": "1.1.0",
+    "description": "EOCIS Geospatial Information",
+    "links": [
+        {
+            "rel": "child",
+            "href": "/collections/eocis-chuk-geospatial-elevation",
+            "type": "application/json",
+            "title": "EOCIS CHUK Geospatial Information - Elevation"
+        },
+        {
+            "rel": "child",
+            "href": "/collections/eocis-chuk-geospatial-landcover",
+            "type": "application/json",
+            "title": "EOCIS CHUK Geospatial Information - Land Cover"
+        },
+        {
+            "rel": "child",
+            "href": "/collections/eocis-chuk-geospatial-builtarea",
+            "type": "application/json",
+            "title": "EOCIS CHUK Geospatial Information - Built Area"
+        }
+    ],
+    "title": "EOCIS Geospatial Information",
+    "extent": {
+        "spatial": {
+            "bbox": [
+                [
+                    -15.37247,
+                    47.08979,
+                    4.74876,
+                    61.13232
+                ]
+            ]
+        },
+        "temporal": {
+            "interval": [
+                [
+                    "2023-07-01T00:00:00Z",
+                    "2023-07-01T00:00:00Z"
+                ]
+            ]
+        }
+    },
+    "license": "cc-by-4.0",
+    "assets": {
+        "thumbnail": {
+            "href": "https://eocis.org/data/chuk_geospatial/EOCIS-CHUK_GEOSPATIAL_INFORMATION-L4-ELEVATION-MERGED-2023-fv1.0.png",
+            "type": "image/png",
+            "roles": [
+                "thumbnail"
+            ]
+        }
+    }
+}

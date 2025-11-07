@@ -139,7 +139,10 @@ def generate_kerchunk(filepath, url, outpath):
 
 class Netcdf2Stac:
 
-    def __init__(self, base_folder, auxilary_base_folder, input_paths, config_paths, collection_filename="collection.json", item_subfolder="items",
+    def __init__(self, base_folder, auxilary_base_folder, input_paths, config_paths,
+                 collection_filename="collection.json",
+                 parent_collection_path = None,
+                 item_subfolder="items",
                  generate_kerchunk_assets=True, inline_kerchunk=False, generate_netcdf_assets=True,
                  generate_collection_thumbnail_asset=False,
                  overwrite_items=False):
@@ -147,10 +150,13 @@ class Netcdf2Stac:
         self.auxilary_base_folder = auxilary_base_folder
         self.input_paths = input_paths
         self.collection_filename = collection_filename
+        self.parent_collection_path = parent_collection_path
+
         if self.collection_filename:
             self.collection_path = os.path.join(self.base_folder,self.collection_filename)
         else:
             self.collection_path = ""
+
         self.item_subfolder = item_subfolder
         self.config_paths = config_paths
 
@@ -207,6 +213,13 @@ class Netcdf2Stac:
                 self.bbox = old_collection.extent.spatial.bboxes[0]
                 self.logger.info(f"Loaded existing collection {self.start_date} - {self.end_date}")
 
+        if self.parent_collection_path is not None:
+            with open(self.parent_collection_path) as f:
+                o = json.loads(f.read())
+                self.parent_collection = pystac.Collection.from_dict(o)
+        else:
+            self.parent_collection = None
+
         extra_fields = {}
         for (key,value) in self.config.get("defaults",{}).get("all",{}).items():
             extra_fields[key] = copy.deepcopy(value)
@@ -216,8 +229,9 @@ class Netcdf2Stac:
         for p in self.config.get("providers",[]):
             providers.append(pystac.Provider(**p))
 
-        self.collection = pystac.Collection(id=self.config.get("stac_collection_id", str(uuid.uuid4())),
-                                            href=self.collection_filename,
+        collection_id = self.config["stac_collection_id"]
+        self.collection = pystac.Collection(id=collection_id,
+                                            href=f"https://stac.ceda.ac.uk/collections/{collection_id}",
                                             extent=None,
                                             extra_fields=extra_fields,
                                             license=self.config["license"],
@@ -227,6 +241,22 @@ class Netcdf2Stac:
                                             stac_extensions=self.config.get("stac-extensions",[]),
                                             catalog_type=pystac.CatalogType.SELF_CONTAINED,
                                             providers=providers)
+        if self.parent_collection:
+            self.collection.add_link(pystac.Link(pystac.RelType.PARENT,
+                                                 target=f"/collections/{self.parent_collection.id}",
+                                                 media_type=pystac.MediaType.JSON,
+                                                 title=self.parent_collection.title))
+            child_link_found = False
+            for link in self.parent_collection.links:
+                if isinstance(link.target,str) and link.target == f"/collections/{collection_id}":
+                    child_link_found = True
+            if not child_link_found:
+                self.parent_collection.add_link(pystac.Link(pystac.RelType.CHILD,
+                                     target=f"/collections/{collection_id}",
+                                     media_type=pystac.MediaType.JSON,
+                                     title=self.collection.title))
+                with open(self.parent_collection_path, "w") as f:
+                    f.write(json.dumps(self.parent_collection.to_dict(include_self_link=False), indent=4))
 
         if "thumbnail" in self.config:
             tcfg = self.config["thumbnail"]

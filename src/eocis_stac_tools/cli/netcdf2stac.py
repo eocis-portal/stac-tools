@@ -39,6 +39,7 @@ def main():
     parser.add_argument("--auxilary-folder", help="folder to write auxilary items to", required=True)
     parser.add_argument("--input-paths", nargs="+", help="path(s) to netcdf4 file(s)", required=True)
     parser.add_argument("--collection-filename", help="name of collection", default="collection.json")
+    parser.add_argument("--parent-collection-path", help="path to a parent collection STAC record", default=None)
     parser.add_argument("--item-subfolder", help="name of folder for storing items", default="items")
     parser.add_argument("--config-paths", nargs="+", help="path to JSON configuration file(s)", required=True)
     parser.add_argument("--include-kerchunk", action="store_true", help="generate a kerchunk file for each item")
@@ -53,6 +54,7 @@ def main():
         converter = Netcdf2Stac(base_folder=args.base_folder, auxilary_base_folder=args.auxilary_folder,
                                 input_paths=args.input_paths,
                                 collection_filename=args.collection_filename, item_subfolder=args.item_subfolder,
+                                parent_collection_path=args.parent_collection_path,
                                 config_paths=args.config_paths, generate_kerchunk_assets=args.include_kerchunk,
                                 inline_kerchunk=args.inline_kerchunk,
                                 generate_collection_thumbnail_asset=args.include_collection_thumbnail,

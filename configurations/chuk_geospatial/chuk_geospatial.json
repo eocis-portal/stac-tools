@@ -1,5 +1,7 @@
 {
-  "stac_collection_id": "eocis-chuk-geospatial",
+  "stac_collection_id": "eocis-chuk-geospatial-test",
+  "title": "EOCIS CHUK Geospatial Information",
+  "description": "This dataset contains categorical geographical information data files for the UK to enable the effective translation of climate data into new forms of actionable information. The information files cover the following attributes: built and paved area fractions, land cover and elevation",
   "defaults": {
     "all": {
       "sci:doi": "10.5285/b766867ceadb409da64d480bdbe4057d",
