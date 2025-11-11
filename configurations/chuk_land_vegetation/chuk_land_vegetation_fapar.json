@@ -1,0 +1,44 @@
+{
+  "stac_collection_id": "eocis-chuk-land_vegetation-fapar",
+  "title": "CHUK dataset of the Fraction of Absorbed Photosynthetically Active Radiation",
+  "description": "The fraction of absorbed photosynthetically active radiation (fAPAR) are produced from April 2018 to December 2024. These data were produced by the LEAF toolbox (see documentation) from data acquired from the Multispectral Imager (MSI) on Sentinel-2. Gap-filled data are available for 100m spatial resolution at a 15-day temporal resolution. The data must be divided by a scaling factor of 200.",
+  "variable": "FAPAR",
+  "defaults": {
+    "all": {
+    },
+    "item": {
+      "raster:scale": 0.005
+    },
+    "netcdf_asset": {
+    },
+    "kerchunk_asset": {
+    }
+  },
+  "cube:variables": {
+    "FAPAR": {
+      "description": "Fraction of Absorbed Photosynthetically Active Radiation",
+      "dimensions": [
+        "time",
+        "y",
+        "x"
+      ],
+      "type": "data",
+      "unit": "1"
+    }
+  },
+  "global_attrs": [
+  ],
+  "global_attr_map": {
+  },
+  "netcdf_url": "https://dap.ceda.ac.uk/neodc/eocis/data/CHUK/land_vegetation_parameters/15_days/{year}/100m_gap_filled/2_FAPAR/",
+  "kerchunk_url": "https://eocis.org/data/chuk-land-vegetation-fapar/items/{year}/{month:02}/",
+  "thumbnail_url": "https://eocis.org/data/chuk-land-vegetation-fapar/items/{year}/{month:02}/",
+  "thumbnail": {
+    "variable": "FAPAR",
+    "cmap": "Greens",
+    "vmin": 0,
+    "vmax": 200,
+    "x-coordinate": "x",
+    "y-coordinate": "y"
+  }
+}

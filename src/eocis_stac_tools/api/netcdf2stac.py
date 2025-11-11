@@ -339,7 +339,10 @@ class Netcdf2Stac:
             self.logger.exception(f"Reading {fpath}")
             return False
 
-        bbox = i.get_bbox()
+        if "bbox" in self.config:
+            bbox = self.config["bbox"]
+        else:
+            bbox = i.get_bbox()
 
         if self.bbox is None:
             self.bbox = bbox

@@ -1,0 +1,76 @@
+{
+  "license": "cc-by-4.0",
+  "defaults": {
+    "all": {
+      "sci:doi": "10.5285/da96a0e3306d44a398126403e5d3a654",
+      "sci:citation": "Mohamed, O.; Dash, J. (2025): EOCIS: Land Vegetation Parameters, V1. NERC EDS Centre for Environmental Data Analysis, 22 July 2025. doi:10.5285/da96a0e3306d44a398126403e5d3a654",
+      "sci:publications": [
+      ],
+      "cube:dimensions": {
+        "x": {
+          "type": "spatial",
+          "axis": "x",
+          "extent": [
+            -613350,
+            911550
+          ],
+          "reference_system": 27700,
+          "unit": "m"
+        },
+        "y": {
+          "type": "spatial",
+          "axis": "y",
+          "extent": [
+            -289850,
+            1323250
+          ],
+          "reference_system": 27700,
+          "unit": "m"
+        },
+        "time": {
+          "type": "temporal",
+          "step": "P15D"
+        }
+      }
+    },
+    "item": {
+    },
+    "netcdf_asset": {
+    },
+    "kerchunk_asset": {
+    }
+  },
+  "global_attrs": [
+    "Conventions"
+  ],
+  "global_attr_map": {
+    "spatial_resolution": "resolution"
+  },
+  "providers": [
+    {
+      "name": "School of Geography and Environmental Science, Southampton University, UK",
+      "roles": [
+        "producer"
+      ],
+      "url": "https://www.southampton.ac.uk/people/5wzysq/professor-jadu-dash"
+    },
+    {
+      "name": "Earth Observation Climate Information Service (EOCIS)",
+      "roles": [
+        "producer"
+      ],
+      "url": "https://eocis.org"
+    },
+    {
+      "name": "Centre for Environmental Data Analysis (CEDA)",
+      "roles": [
+        "host"
+      ],
+      "url": "https://ceda.ac.uk"
+    }
+  ],
+  "bbox": [1, 2, 3, 4],
+  "stac-extensions": [
+    "https://stac-extensions.github.io/raster/v2.0.0/schema.json"
+  ]
+}

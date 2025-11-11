@@ -1,0 +1,44 @@
+{
+  "stac_collection_id": "eocis-chuk-land_vegetation-lai",
+  "title": "CHUK dataset of the Leaf Area Index (LAI)",
+  "description": "Leaf area index (LAI) are produced from April 2018 to December 2024. These data were produced by the LEAF toolbox (see documentation) from data acquired from the Multispectral Imager (MSI) on Sentinel-2. Gap-filled data are available for 100m spatial resolution at a 15-day temporal resolution.  The data must be divided by a scaling factor of 20.",
+  "variable": "lai_leaf_index",
+  "defaults": {
+    "all": {
+    },
+    "item": {
+      "raster:scale": 0.05
+    },
+    "netcdf_asset": {
+    },
+    "kerchunk_asset": {
+    }
+  },
+  "cube:variables": {
+    "lai_leaf_index": {
+      "description": "Leaf Area Index",
+      "dimensions": [
+        "time",
+        "y",
+        "x"
+      ],
+      "type": "data",
+      "unit": "1"
+    }
+  },
+  "global_attrs": [
+  ],
+  "global_attr_map": {
+  },
+  "netcdf_url": "https://dap.ceda.ac.uk/neodc/eocis/data/CHUK/land_vegetation_parameters/15_days/{year}/100m_gap_filled/1_LAI/",
+  "kerchunk_url": "https://eocis.org/data/chuk-land-vegetation-lai/items/{year}/{month:02}/",
+  "thumbnail_url": "https://eocis.org/data/chuk-land-vegetation-lai/items/{year}/{month:02}/",
+  "thumbnail": {
+    "variable": "lai_leaf_index",
+    "cmap": "Greens",
+    "vmin": 0,
+    "vmax": 20,
+    "x-coordinate": "x",
+    "y-coordinate": "y"
+  }
+}
