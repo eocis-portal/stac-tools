@@ -1,0 +1,42 @@
+{
+  "stac_collection_id": "eocis-chuk-geospatial-landclass",
+  "title": "EOCIS CHUK Geospatial Information - Land Class",
+  "description": "Land classification data on the CHUK grid derived from ESA Satellite Land Cover (https://cds.climate.copernicus.eu/datasets/satellite-land-cover)",
+  "variable": "lccs_class",
+  "license": "cc-by-4.0",
+  "keywords": [
+    "Land Cover",
+    "UK"
+  ],
+  "defaults": {
+    "item": {
+      "cube:variables": {
+        "lccs_class": {
+          "description": "Land Class data on the CHUK grid",
+          "dimensions": [
+            "y",
+            "x"
+          ],
+          "type": "data",
+          "unit": ""
+        }
+      },
+      "renders": {
+      }
+    },
+    "netcdf_asset": {
+    },
+    "kerchunk_asset": {
+    }
+  },
+  "templated_properties": {
+    "title": "EOCIS CHUK Geospatial Information - Land Class - ${year}"
+  },
+  "netcdf_url": "https://dap.ceda.ac.uk/neodc/eocis/data/CHUK/geospatial_information/v1.1/",
+  "kerchunk_url": "https://eocis.org/data/chuk_geospatial/",
+  "thumbnail_url": "https://eocis.org/data/chuk_geospatial/",
+  "cog_url": "https://eocis.org/data/chuk_geospatial/",
+  "thumbnail": {
+    "image_path": "EOCIS-CHUK_GEOSPATIAL_INFORMATION-L4-LANDCLASS-MERGED-2001-fv1.1.png"
+  }
+}

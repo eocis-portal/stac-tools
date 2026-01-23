@@ -1,10 +1,37 @@
 {
-  "stac_collection_id": "eocis-chuk-land_vegetation-fapar",
-  "title": "CHUK dataset of the Fraction of Absorbed Photosynthetically Active Radiation",
+  "stac_collection_id": "eocis-chuk-land-vegetation-fapar",
+  "title": "EOCIS CHUK Fraction of Absorbed Photosynthetically Active Radiation",
   "description": "The fraction of absorbed photosynthetically active radiation (fAPAR) are produced from April 2018 to December 2024. These data were produced by the LEAF toolbox (see documentation) from data acquired from the Multispectral Imager (MSI) on Sentinel-2. Gap-filled data are available for 100m spatial resolution at a 15-day temporal resolution. The data must be divided by a scaling factor of 200.",
   "variable": "FAPAR",
   "defaults": {
     "all": {
+      "cube:variables": {
+        "FAPAR": {
+          "description": "Fraction of Absorbed Photosynthetically Active Radiation",
+          "dimensions": [
+            "time",
+            "y",
+            "x"
+          ],
+          "type": "data",
+          "unit": "1"
+        }
+      },
+      "renders": {
+        "FAPAR": {
+          "title": "Fraction of Absorbed Photosynthetically Active Radiation",
+          "assets": [
+            "reference_file"
+          ],
+          "reference": true,
+          "variable": "FAPAR",
+          "colormap_name": "Greens",
+          "rescale": [
+            0,
+            200
+          ]
+        }
+      }
     },
     "item": {
       "raster:scale": 0.005
@@ -14,17 +41,10 @@
     "kerchunk_asset": {
     }
   },
-  "cube:variables": {
-    "FAPAR": {
-      "description": "Fraction of Absorbed Photosynthetically Active Radiation",
-      "dimensions": [
-        "time",
-        "y",
-        "x"
-      ],
-      "type": "data",
-      "unit": "1"
-    }
+  "templated_properties": {
+    "platform": "${platform}",
+    "sensor": "${sensor}",
+    "title": "EOCIS Fraction of Absorbed Photosynthetically Active Radiation ${start_year}-${start_month}-${start_day} to ${end_year}-${end_month}-${end_day}"
   },
   "global_attrs": [
   ],
@@ -40,5 +60,6 @@
     "vmax": 200,
     "x-coordinate": "x",
     "y-coordinate": "y"
-  }
+  },
+  "date_extract": ""
 }

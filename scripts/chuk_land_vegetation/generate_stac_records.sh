@@ -1,13 +1,11 @@
 #!/bin/bash
 
-conda init
-
 conda activate stac_tools_env
 
 output_folder=stac-tmp
 
-# input_paths_lai=/neodc/eocis/data/CHUK/land_vegetation_parameters/15_days/????/100m_gap_filled/1_LAI/*.nc
-input_paths_lai=../../configurations/chuk_land_vegetation/data/EOCIS-LAI-L2-CHUK-LEAF-GAP-FILLED-100m-20201216-20201231-V1.nc
+input_paths_lai=/neodc/eocis/data/CHUK/land_vegetation_parameters/15_days/????/100m_gap_filled/1_LAI/*.nc
+# input_paths_lai=../../data/EOCIS-LAI-L2-CHUK-LEAF-GAP-FILLED-100m-20201216-20201231-V1.nc
 
 echo Generating STAC records for eocis-chuk-land-vegetation-lai
 
@@ -21,12 +19,13 @@ netcdf2stac --base-folder $output_folder/eocis-chuk-land-vegetation-lai \
             ../../configurations/chuk_land_vegetation/chuk_land_vegetation_lai.json \
     --include-kerchunk \
     --include-collection-thumbnail \
+    --include-item-thumbnails \
     --overwrite-items
 
 echo Generating STAC records for eocis-chuk-land-vegetation-fapar
 
-# input_paths_fapar=/neodc/eocis/data/CHUK/land_vegetation_parameters/15_days/????/100m_gap_filled/2_FAPAR/*.nc
-input_paths_fapar=../../configurations/chuk_land_vegetation/data/EOCIS-FAPAR-L2-CHUK-LEAF-GAP-FILLED-100m-20201216-20201231-V1.nc
+input_paths_fapar=/neodc/eocis/data/CHUK/land_vegetation_parameters/15_days/????/100m_gap_filled/2_FAPAR/*.nc
+# input_paths_fapar=../../data/EOCIS-FAPAR-L2-CHUK-LEAF-GAP-FILLED-100m-20201216-20201231-V1.nc
 
 netcdf2stac --base-folder $output_folder/eocis-chuk-land-vegetation-fapar \
     --auxilary-folder $output_folder/eocis-chuk-land-vegetation-fapar-aux \
@@ -38,5 +37,6 @@ netcdf2stac --base-folder $output_folder/eocis-chuk-land-vegetation-fapar \
             ../../configurations/chuk_land_vegetation/chuk_land_vegetation_fapar.json \
     --include-kerchunk \
     --include-collection-thumbnail \
+    --include-item-thumbnails \
     --overwrite-items
 

@@ -1,10 +1,37 @@
 {
-  "stac_collection_id": "eocis-chuk-land_vegetation-lai",
-  "title": "CHUK dataset of the Leaf Area Index (LAI)",
+  "stac_collection_id": "eocis-chuk-land-vegetation-lai",
+  "title": "EOCIS CHUK Leaf Area Index (LAI)",
   "description": "Leaf area index (LAI) are produced from April 2018 to December 2024. These data were produced by the LEAF toolbox (see documentation) from data acquired from the Multispectral Imager (MSI) on Sentinel-2. Gap-filled data are available for 100m spatial resolution at a 15-day temporal resolution.  The data must be divided by a scaling factor of 20.",
   "variable": "lai_leaf_index",
   "defaults": {
     "all": {
+       "cube:variables": {
+        "lai_leaf_index": {
+          "description": "Leaf Area Index",
+          "dimensions": [
+            "time",
+            "y",
+            "x"
+          ],
+          "type": "data",
+          "unit": "1"
+        }
+      },
+      "renders": {
+        "lai_leaf_index": {
+          "title": "Leaf Area Index (LAI)",
+          "assets": [
+            "reference_file"
+          ],
+          "reference": true,
+          "variable": "lai_leaf_index",
+          "colormap_name": "Greens",
+          "rescale": [
+            0,
+            20
+          ]
+        }
+      }
     },
     "item": {
       "raster:scale": 0.05
@@ -14,17 +41,10 @@
     "kerchunk_asset": {
     }
   },
-  "cube:variables": {
-    "lai_leaf_index": {
-      "description": "Leaf Area Index",
-      "dimensions": [
-        "time",
-        "y",
-        "x"
-      ],
-      "type": "data",
-      "unit": "1"
-    }
+  "templated_properties": {
+      "platform": "${platform}",
+      "sensor": "${sensor}",
+      "title": "EOCIS Leaf Area Index ${start_year}-${start_month}-${start_day} to ${end_year}-${end_month}-${end_day}"
   },
   "global_attrs": [
   ],

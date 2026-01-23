@@ -21,6 +21,12 @@
             "href": "/collections/eocis-chuk-geospatial-builtarea",
             "type": "application/json",
             "title": "EOCIS CHUK Geospatial Information - Built Area"
+        },
+        {
+            "rel": "child",
+            "href": "/collections/eocis-chuk-geospatial-landclass",
+            "type": "application/json",
+            "title": "EOCIS CHUK Geospatial Information - Land Class"
         }
     ],
     "title": "EOCIS Geospatial Information",

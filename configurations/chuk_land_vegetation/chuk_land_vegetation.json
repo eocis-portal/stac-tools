@@ -69,8 +69,9 @@
       "url": "https://ceda.ac.uk"
     }
   ],
-  "bbox": [1, 2, 3, 4],
+  "bbox": [-20.61388763804565, 46.52164871674995, 7.619937435522532, 61.79039902300326],
   "stac-extensions": [
     "https://stac-extensions.github.io/raster/v2.0.0/schema.json"
-  ]
+  ],
+  "date_extractor_path": "date_extract.py"
 }

@@ -16,7 +16,7 @@ Suggested environment:
 ```
 mamba create -n stac_tools_env python=3.10
 mamba activate stac_tools_env
-mamba install xarray netcdf4 pystac pystac-client httpx requests kerchunk h5py aiohttp matplotlib zarr datashader pillow mako
+mamba install xarray netcdf4 rioxarray pystac pystac-client httpx requests kerchunk h5py aiohttp matplotlib zarr datashader pillow mako
 mamba install cartopy
 pip install httpx_auth
 ```
@@ -64,6 +64,8 @@ options:
                         generate a thumbnail image for each item
   --include-collection-thumbnail
                         generate a thumbnail image for the collection based on the last processed item
+  --include-item-thumbnails
+                        generate a thumbnail image for every item                      
   --overwrite-items     overwrite item/kerchunk files if they already exist
 ```
 

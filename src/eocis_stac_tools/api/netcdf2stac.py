@@ -38,6 +38,7 @@ import xarray as xr
 from kerchunk.hdf import SingleHdf5ToZarr
 from .thumbnail import Thumbnail
 from .static_thumbnail import StaticThumbnail
+from .cog_generation import generate_cog
 
 def expand_dt_template(s, dt):
     return s.format(**{
@@ -52,6 +53,18 @@ def floats(seq):
 def fmt_date(dt):
     return dt.strftime("%Y-%m-%dT%H:%M:%S%Z").replace("UTC","Z")
 
+class CustomDateExtractor:
+
+    def __init__(self, code_path):
+        self.locals = {}
+        self.globals = {}
+        with open(code_path) as f:
+            exec(f.read(), globals(), globals())
+
+
+    def extract(self, filepath, ds):
+        return globals()["date_extract"](filepath, ds)
+
 class DatasetWrapper:
 
     def __init__(self, fpath, var_id):
@@ -60,15 +73,29 @@ class DatasetWrapper:
         self.var_id = var_id
         self.var = self.ds[var_id]
 
+    def get_spatial_extent(self, axis, values):
+        values.append(self.ds[axis].min().item())
+        values.append(self.ds[axis].max().item())
+
     def get_datetime(self, index=0):
         try:
-            return pandas.Timestamp(self.ds.time.values[index]).to_pydatetime().replace(tzinfo=datetime.timezone.utc)
+            return pandas.Timestamp(self.ds.time.values[index]).to_pydatetime().replace(tzinfo=None)
         except:
             filename = os.path.split(self.fpath)[-1]
             try:
-                return datetime.datetime.strptime(filename[0:8],"%Y%m%d").replace(tzinfo=datetime.timezone.utc)
+                return datetime.datetime.strptime(filename[0:8],"%Y%m%d").replace(tzinfo=None)
             except:
-                return datetime.datetime.strptime(filename[0:6],"%Y%m").replace(tzinfo=datetime.timezone.utc, day=15)
+                return datetime.datetime.strptime(filename[0:6],"%Y%m").replace(tzinfo=None, day=15)
+
+    def get_datetime_interval(self, index=0):
+        if "time_bnds" in self.ds:
+            start_dt = (pandas.Timestamp(self.ds.time_bnds.values[index,0]).to_pydatetime().replace(
+                tzinfo=None))
+            end_dt = pandas.Timestamp(self.ds.time_bnds.values[index,1]).to_pydatetime().replace(
+                tzinfo=None)
+            return (start_dt, end_dt)
+        return (None, None)
+
 
     def get_bbox(self):
         # use the geopspatial min/max metdata if present
@@ -130,6 +157,14 @@ def get_thumbnail_asset_dict(fpath, config, dt):
         d.update(config["defaults"]["thumbnail_asset"])
     return d
 
+def get_cog_asset_dict(fpath, config, dt):
+    d = {
+        "href": f"{expand_dt_template(config['cog_url'], dt)}{fpath}",
+    }
+    if "cog_asset" in config["defaults"]:
+        d.update(config["defaults"]["cog_asset"])
+    return d
+
 def generate_kerchunk(filepath, url, outpath):
     with open(filepath, "rb") as f:
         h5chunks = SingleHdf5ToZarr(f, url, inline_threshold=300)
@@ -145,7 +180,12 @@ class Netcdf2Stac:
                  item_subfolder="items",
                  generate_kerchunk_assets=True, inline_kerchunk=False, generate_netcdf_assets=True,
                  generate_collection_thumbnail_asset=False,
-                 overwrite_items=False):
+                 generate_item_thumbnail_assets=False,
+                 overwrite_items=False,
+                 generate_cog=[],
+                 cog_nodata_values={},
+                 cog_dtypes={},
+                 cog_crs=None):
         self.base_folder = base_folder
         self.auxilary_base_folder = auxilary_base_folder
         self.input_paths = input_paths
@@ -172,7 +212,13 @@ class Netcdf2Stac:
         self.generate_netcdf_assets = generate_netcdf_assets
 
         self.generate_collection_thumbnail_asset = generate_collection_thumbnail_asset
+        self.generate_item_thumbnail_assets = generate_item_thumbnail_assets
         self.overwrite_items = overwrite_items
+
+        self.generate_cog = generate_cog
+        self.cog_nodata_values = cog_nodata_values
+        self.cog_dtypes = cog_dtypes
+        self.cog_crs = cog_crs
 
         def merge(d1, d2):
             # recursively merge configurations d1 and d2, give d2 priority
@@ -192,16 +238,21 @@ class Netcdf2Stac:
             return d2
 
         self.config = {}
+        self.custom_date_extractor = None
+        date_extractor_path = None
         for config_path in self.config_paths:
+            config_dir = os.path.dirname(config_path)
             with open(config_path) as f:
-                self.config = merge(self.config, json.loads(f.read()))
+                config = json.load(f)
+                self.config = merge(self.config, config)
+                if "date_extractor_path" in config:
+                    date_extractor_path = os.path.join(config_dir,config["date_extractor_path"])
 
         if "license" not in self.config:
             raise Exception("The configuration must include a top level key 'license'")
 
-        self.climatology_interval = None
-        if "climatology_interval" in self.config:
-            self.climatology_interval = (datetime.datetime.strptime(self.config["climatology_interval"][0],"%Y-%m-%d"),datetime.datetime.strptime(self.config["climatology_interval"][1],"%Y-%m-%d"))
+        if date_extractor_path is not None:
+            self.custom_date_extractor = CustomDateExtractor(date_extractor_path)
 
         if self.collection_path is not None and os.path.exists(self.collection_path):
             # read start/end dates from the existing collection
@@ -307,7 +358,7 @@ class Netcdf2Stac:
             if idx == len(all_paths)-1 and self.generate_collection_thumbnail_asset:
                 thumbnail_asset = self.process_item(all_paths[idx], return_thumbnail_asset=True)
             else:
-                self.process_item(all_paths[idx])
+                self.process_item(all_paths[idx], return_thumbnail_asset=self.generate_item_thumbnail_assets)
 
         if self.collection_path:
             self.finalise_collection(thumbnail_asset)
@@ -316,7 +367,7 @@ class Netcdf2Stac:
         if thumbnail_asset is not None:
             self.collection.add_asset("thumbnail",thumbnail_asset)
         spatial_extent = pystac.SpatialExtent([self.bbox])
-        temporal_extent = pystac.TemporalExtent([self.start_date, self.end_date]) if self.climatology_interval is None else pystac.TemporalExtent(list(self.climatology_interval))
+        temporal_extent = pystac.TemporalExtent([self.start_date, self.end_date])
         extent = pystac.Extent(spatial_extent, temporal_extent)
         self.collection.extent = extent
         extra_time = self.collection.extra_fields.get("cube:dimensions",{}).get("time",None)
@@ -360,10 +411,18 @@ class Netcdf2Stac:
             if max_y > self.bbox[3]:
                 self.bbox[3] = max_y
 
-        if "timestamp" in self.config:
-            dt = datetime.datetime.fromisoformat(self.config["timestamp"])
+        if self.custom_date_extractor is not None:
+            interval_start_dt, dt, interval_end_dt = self.custom_date_extractor.extract(fpath,i.get_dataset())
         else:
-            dt = i.get_datetime(0)
+            if "timestamp" in self.config:
+                dt = datetime.datetime.fromisoformat(self.config["timestamp"])
+                print(dt)
+            else:
+                dt = i.get_datetime(0)
+
+
+            interval_start_dt, interval_end_dt = i.get_datetime_interval()
+            print(interval_start_dt, interval_end_dt)
 
         item_subfolder = expand_dt_template(self.item_subfolder,dt)
         os.makedirs(os.path.join(self.base_folder, item_subfolder), exist_ok=True)
@@ -390,8 +449,13 @@ class Netcdf2Stac:
 
         if self.start_date is None or dt < self.start_date:
             self.start_date = dt
+        if interval_start_dt is not None and interval_start_dt < self.start_date:
+            self.start_date = interval_start_dt
+
         if self.end_date is None or dt > self.end_date:
             self.end_date = dt
+        if interval_end_dt is not None and interval_end_dt > self.end_date:
+            self.end_date = interval_end_dt
 
         props = {}
         for (key, value) in self.config.get("defaults", {}).get("all", {}).items():
@@ -402,6 +466,15 @@ class Netcdf2Stac:
         extra_time = props.get("cube:dimensions", {}).get("time", None)
         if extra_time:
             extra_time["values"] = [fmt_date(dt)]
+
+        x_extent = props.get("cube:dimensions", {}).get("x", {}).get("extent",None)
+        y_extent = props.get("cube:dimensions", {}).get("y", {}).get("extent", None)
+
+        if x_extent == []:
+            i.get_spatial_extent("x", x_extent)
+        if y_extent == []:
+            i.get_spatial_extent("y", y_extent)
+
 
         props["license"] = self.config["license"]
 
@@ -434,6 +507,15 @@ class Netcdf2Stac:
                     template_properties["year"] = f"{dt.year:04d}"
                     template_properties["month"] = f"{dt.month:02d}"
                     template_properties["day"] = f"{dt.day:02d}"
+                    if interval_start_dt is not None:
+                        template_properties["start_year"] = f"{interval_start_dt.year:04d}"
+                        template_properties["start_month"] = f"{interval_start_dt.month:02d}"
+                        template_properties["start_day"] = f"{interval_start_dt.day:02d}"
+                    if interval_end_dt is not None:
+                        template_properties["end_year"] = f"{interval_end_dt.year:04d}"
+                        template_properties["end_month"] = f"{interval_end_dt.month:02d}"
+                        template_properties["end_day"] = f"{interval_end_dt.day:02d}"
+
                     v = template.render(**template_properties)
                     if directive == "comma_separated_list":
                         v = list(map(lambda s: s.strip(),v.split(",")))
@@ -441,20 +523,16 @@ class Netcdf2Stac:
                 except Exception as ex:
                     print(f"warning, unable to resolve template {prop} {tmpl}: {ex}")
 
-        if self.climatology_interval is not None:
-            props["day_of_year"] = dt.timetuple()[7]
-
         input_filename = os.path.split(fpath)[-1]
 
         output_filename = os.path.splitext(input_filename)[0] + ".geojson"
 
         date_arguments = {}
-        if self.climatology_interval is None:
-            date_arguments["datetime"] = dt
-        else:
-            date_arguments["datetime"] = dt
-            date_arguments["start_datetime"] = self.climatology_interval[0]
-            date_arguments["end_datetime"] = self.climatology_interval[1]
+        date_arguments["datetime"] = dt
+
+        if interval_start_dt is not None and interval_end_dt is not None:
+            date_arguments["start_datetime"] = interval_start_dt
+            date_arguments["end_datetime"] = interval_end_dt
 
         item = pystac.Item(id=item_id,
                            href=output_filename,
@@ -504,6 +582,23 @@ class Netcdf2Stac:
                                  extra_fields=asset_dict)
             item.add_asset(asset_key,asset)
 
+        if self.generate_cog:
+            for variable in self.generate_cog:
+                tif_filename = os.path.splitext(input_filename)[0] + "_" + variable + ".tif"
+                asset_dict = get_cog_asset_dict(tif_filename, self.config, dt)
+                cog_href = asset_dict["href"]
+                del asset_dict["href"]
+                tif_filepath = os.path.join(self.auxilary_base_folder, item_subfolder, tif_filename)
+                generate_cog(i.get_dataset(), variable, tif_filepath,
+                             dtype=self.cog_dtypes.get(variable),
+                             nodata_value=self.cog_nodata_values.get(variable),
+                             crs = self.cog_crs)
+                asset_key = f"data_{variable}"
+                asset = pystac.Asset(href=cog_href,
+                                     roles=["data"],
+                                     media_type="image/tiff; application=geotiff",
+                                     extra_fields=asset_dict)
+                item.add_asset(asset_key, asset)
         thumbnail_asset = None
 
         if return_thumbnail_asset and self.thumbnail_generator is not None:

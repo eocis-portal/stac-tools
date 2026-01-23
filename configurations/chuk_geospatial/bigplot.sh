@@ -10,10 +10,18 @@ conda activate netcdfexplorer_env
 #         --plot-width 512 --flip --cchart landcover_colours.json --vmin 0 --vmax 1200 --legend-height 0
 #fi
 
-if [ -f "EOCIS-CHUK_GEOSPATIAL_INFORMATION-L4-BUILTAREA-MERGED-2023-fv1.1.nc" ];
+#if [ -f "EOCIS-CHUK_GEOSPATIAL_INFORMATION-L4-BUILTAREA-MERGED-2023-fv1.1.nc" ];
+#then
+#   bigplot --input-path built_area_masked.nc \
+#         --input-variable urban_area \
+#         --output-path EOCIS-CHUK_GEOSPATIAL_INFORMATION-L4-BUILTAREA-MERGED-2023-fv1.1.png \
+#         --plot-width 512 --cmap viridis --vmin 0 --vmax 1 --legend-height 0
+#fi
+
+if [ -f "EOCIS-CHUK_GEOSPATIAL_INFORMATION-L4-LANDCLASS-MERGED-2001-fv1.1.nc" ];
 then
-   bigplot --input-path built_area_masked.nc \
-         --input-variable urban_area \
-         --output-path EOCIS-CHUK_GEOSPATIAL_INFORMATION-L4-BUILTAREA-MERGED-2023-fv1.1.png \
-         --plot-width 512 --cmap viridis --vmin 0 --vmax 1 --legend-height 0
+   bigplot --input-path EOCIS-CHUK_GEOSPATIAL_INFORMATION-L4-LANDCLASS-MERGED-2001-fv1.1.nc \
+         --input-variable lccs_class \
+         --output-path EOCIS-CHUK_GEOSPATIAL_INFORMATION-L4-LANDCLASS-MERGED-2001-fv1.1.png \
+         --plot-width 512 --cchart landclass_colours.json --vmin 0 --vmax 1200 --legend-height 0
 fi
