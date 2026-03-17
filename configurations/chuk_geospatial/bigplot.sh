@@ -18,10 +18,10 @@ conda activate netcdfexplorer_env
 #         --plot-width 512 --cmap viridis --vmin 0 --vmax 1 --legend-height 0
 #fi
 
-if [ -f "EOCIS-CHUK_GEOSPATIAL_INFORMATION-L4-LANDCLASS-MERGED-2001-fv1.1.nc" ];
-then
-   bigplot --input-path EOCIS-CHUK_GEOSPATIAL_INFORMATION-L4-LANDCLASS-MERGED-2001-fv1.1.nc \
+# if [ -f "EOCIS-CHUK_GEOSPATIAL_INFORMATION-L4-LANDCLASS-MERGED-2001-fv1.1.nc" ];
+# then
+   bigplot --input-path EOCIS-CHUK_GEOSPATIAL_INFORMATION-L4-LANDCLASS-MERGED-2002-fv1.1.nc \
          --input-variable lccs_class \
-         --output-path EOCIS-CHUK_GEOSPATIAL_INFORMATION-L4-LANDCLASS-MERGED-2001-fv1.1.png \
-         --plot-width 512 --cchart landclass_colours.json --vmin 0 --vmax 1200 --legend-height 0
-fi
+         --output-path EOCIS-CHUK_GEOSPATIAL_INFORMATION-L4-LANDCLASS-MERGED-2002-fv1.1.png \
+         --plot-width 512 --cchart landclass_colours.json
+# fi

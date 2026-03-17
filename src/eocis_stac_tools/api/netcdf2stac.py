@@ -259,8 +259,8 @@ class Netcdf2Stac:
             with open(self.collection_path) as f:
                 o = json.loads(f.read())
                 old_collection = pystac.Collection.from_dict(o)
-                self.start_date = old_collection.extent.temporal.intervals[0][0]
-                self.end_date = old_collection.extent.temporal.intervals[0][1]
+                self.start_date = old_collection.extent.temporal.intervals[0][0].replace(tzinfo=None)
+                self.end_date = old_collection.extent.temporal.intervals[0][1].replace(tzinfo=None)
                 self.bbox = old_collection.extent.spatial.bboxes[0]
                 self.logger.info(f"Loaded existing collection {self.start_date} - {self.end_date}")
 

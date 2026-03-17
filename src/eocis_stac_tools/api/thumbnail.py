@@ -23,12 +23,13 @@
 import os
 import json
 
+import xarray as xr
+
 import datashader as dsh
 import datashader.transfer_functions as tf
 from datashader import reductions as rd
 
 from PIL import Image
-
 
 class Thumbnail:
 
@@ -110,3 +111,53 @@ class Thumbnail:
             p.save(f, format="PNG")
 
 
+if __name__ == '__main__':
+    import argparse
+
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--input-path", nargs="+", help="path of netcdf input file(s)", required=True)
+    parser.add_argument("--input-variable",
+                        help="name of variable(s) to plot.  Supply either one variable or three variables (red,green,blue)",
+                        nargs="+", required=True)
+    parser.add_argument("--x", help="name of x coord", default="x")
+    parser.add_argument("--y", help="name of y coord", default="y")
+
+    parser.add_argument("--iselector", nargs=3, help="provide a dimension selector",
+                        metavar=("dimension", "min", "max"),
+                        action="append")
+
+    parser.add_argument("--vmin", type=float, help="minimum input variable value to use in colour scale", default=0)
+    parser.add_argument("--vmax", type=float, help="maximum input variable value to use in colour scale", default=1)
+
+    parser.add_argument("--cmap", help="colour scale to use, should be the  name of a matplotlib color map",
+                        default="turbo")
+
+    parser.add_argument("--background-image-path", help="optional - path to a background image onto which the plot is overlaid",
+                        default=None)
+
+
+    parser.add_argument("--background-image-alpha", help="optional - alpha transparency for the background image",
+                        default=0.2)
+
+
+    parser.add_argument("--plot-width", help="Width of the main image plot, in pixels", type=int, default=1024)
+
+    args = parser.parse_args()
+
+    iselectors = {}
+
+    if args.iselector:
+        for (dimension, min, max) in args.iselector:
+            iselectors[dimension] = range(int(min), int(max) + 1)
+
+    t = Thumbnail(variable=args.input_variable,
+                  vmin=args.vmin, vmax=args.vmax,
+                  x_coord=args.x_coord, y_coord=args.y_coord,
+                  cmap=args.cmap,
+                  plot_width=args.plot_width,
+                  selector=iselectors,
+                  background_image_path=args.background_image_path,
+                  background_alpha=args.background_image_alpha)
+
+    ds = xr.open_dataset(args.input_path)
+    t.generate(ds, args.output_path)
