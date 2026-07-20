@@ -94,7 +94,7 @@ def add_items(client,item_path):
 
         response = client.post(
             urljoin(API_URL, f"collections/{data['collection']}/items"),
-            content=json.dumps(data)
+            json=data
         )
 
         print(response.content)

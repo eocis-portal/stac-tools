@@ -1,0 +1,118 @@
+{
+  "license": "cc-by-4.0",
+  "global_attrs": [
+    "Conventions"
+  ],
+  "providers": [
+    {
+      "name": "University of Leicester, Physics Department",
+      "roles": [
+        "producer"
+      ],
+      "url": "https://le.ac.uk/physics/research/earth-observation-science"
+    },
+    {
+      "name": "Earth Observation Climate Information Service (EOCIS)",
+      "roles": [
+        "producer"
+      ],
+      "url": "https://eocis.org"
+    },
+    {
+      "name": "Centre for Environmental Data Analysis (CEDA)",
+      "roles": [
+        "host"
+      ],
+      "url": "https://ceda.ac.uk"
+    }
+  ],
+  "bbox": [-20.61388763804565, 46.52164871674995, 7.619937435522532, 61.79039902300326],
+  "stac-extensions": [
+    "https://stac-extensions.github.io/raster/v2.0.0/schema.json"
+  ],
+  "stac_collection_id": "eocis-chuk-lst",
+  "title": "EOCIS CHUK Land Surface Temperature",
+  "description": "Daily estimates of Land Surface Temperature at approximately 10.30am from Landsat 8/9 using an optimal estimation retrieval algorithm.  This dataset includes regridded data from Landsat 8/9 Level 1 and L2 Science Product courtesy of the U.S. Geological Survey.",
+  "variable": "lst",
+  "defaults": {
+    "all": {
+        "cube:dimensions": {
+          "x": {
+            "type": "spatial",
+            "axis": "x",
+            "extent": [
+              -613350,
+              911550
+            ],
+            "reference_system": 27700,
+            "unit": "m"
+          },
+          "y": {
+            "type": "spatial",
+            "axis": "y",
+            "extent": [
+              -289850,
+              1323250
+            ],
+            "reference_system": 27700,
+            "unit": "m"
+          },
+          "time": {
+            "type": "temporal",
+            "step": "P1D"
+          }
+        },
+       "cube:variables": {
+        "lst": {
+          "description": "Land Surface Temperature",
+          "dimensions": [
+            "time",
+            "y",
+            "x"
+          ],
+          "type": "data",
+          "unit": "1"
+        }
+      },
+      "renders": {
+        "lst": {
+          "title": "Land Surface Temperature",
+          "assets": [
+            "reference_file"
+          ],
+          "reference": true,
+          "variable": "lst",
+          "colormap_name": "coolwarm",
+          "rescale": [
+            260,
+            320
+          ]
+        }
+      }
+    },
+    "item": {
+      "raster:scale": 0.05
+    },
+    "netcdf_asset": {
+    },
+    "kerchunk_asset": {
+    }
+  },
+  "templated_properties": {
+      "platform": "${platform}",
+      "sensor": "${sensor}",
+      "title": "EOCIS Land Surface Temperature ${start_year}-${start_month}-${start_day} to ${end_year}-${end_month}-${end_day}"
+  },
+  "netcdf_url": "https://dap.ceda.ac.uk/neodc/eocis/data/CHUK/land_surface_temperature/LANDSAT8_TIRS/L2/v1.0/{year}/{month:02}/{day:02}/",
+  "kerchunk_url": "https://eocis.org/data/eocis-chuk-lst/items/{year}/{month:02}/",
+  "thumbnail_url": "https://eocis.org/data/eocis-chuk-lst/items/{year}/{month:02}/",
+  "thumbnail": {
+    "variable": "lst",
+    "cmap": "coolwarm",
+    "vmin": 260,
+    "vmax": 320,
+    "x-coordinate": "x",
+    "y-coordinate": "y"
+  },
+  "date_extractor_path": "date_extract.py"
+}
